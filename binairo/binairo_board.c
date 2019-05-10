@@ -20,11 +20,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "getline.h"
+
 typedef struct RowStruct {
 
 	char* row;
-	int num_of_0s;
-	int num_of_1s;
+	size_t num_of_0s;
+	size_t num_of_1s;
 
 } RowInfo;
 
@@ -32,9 +34,8 @@ typedef struct RowStruct {
 struct BinairoBoardStruct {
 
     RowInfo** contents;     /// filled content on board, either '0' or '1'
-    bool* marked;        /// is the board already marked from the given config
-    size_t width;
-    size_t height;
+    bool* marked;        	/// is the board already marked from the given config
+    size_t dim;				/// dimension of the board
 
 };
 
@@ -48,66 +49,161 @@ BinairoBoard create_BinairoBoard( FILE* config_file ){
     size_t dummy;
     getline( &line, &dummy, config_file );
     
-    size_t width = strtol( line, &line, 10 );
-    size_t height = strtol( line, NULL, 10 );
-
-    if( width <= 0 ){
-        fprintf( stderr, "Error: width should be greater than 0\n" );
-		return NULL;
-    }
-	else if( height <= 0 ){
-		fprintf( stderr, "Error: height should be greater than 0\n" );
+	if ( line == NULL ){
+		fprintf( stderr, "Error: unable to read size of board.\n");
 		return NULL;
 	}
 
+    size_t size = strtol( line, NULL, 10 );
+
+	free( line );
+
+	if( size <= 0 ){
+        fprintf( stderr, "Error: dimension of board should be greater than 0.\n" );
+		return NULL;
+    }
+	
 	// create the actual binairo board
 	BinairoBoard brd = malloc( sizeof( struct BinairoBoardStruct ) );
 	
 	assert( brd );
 
-	brd->width = width;
-	brd->height = height;
+	brd->dim = size;
 
-	brd->contents = calloc( width * height, sizeof( rowInfo* ) );
-	brd->marked = calloc( width * height, sizeof( bool ) );
+	brd->contents = calloc( size * size, sizeof( RowInfo* ) );
+	brd->marked = calloc( size * size, sizeof( bool ) );
 
 	assert( brd->contents && brd->marked );
 
 	// make each row from config file
-	for ( int i=0; i<height; i++ ){
+	for ( size_t i=0; i<size; i++ ){
 
-		brd->contents[i] = malloc( sizeof( rowInfo ) );
+		brd->contents[i] = malloc( sizeof( RowInfo ) );
 		assert( brd->contents[i] );
 		
-		brd->contents[i]->row = calloc( width, sizeof( char ) );
+		brd->contents[i]->row = calloc( size, sizeof( char ) );
 		assert( brd->contents[i]->row );
 
 		brd->contents[i]->num_of_0s = 0;
 		brd->contents[i]->num_of_1s = 0;
 
+		char* line = NULL;
+		size_t dummy;
 		getline( &line, &dummy, config_file );
 
-		//TODO: the rest	 
+		if( strlen( line ) < size + 1 ){
+			fprintf( stderr, "Error: line %lu of configuration file is invalid.", i+1 );
+			destroy_BinairoBoard( brd );
+			return NULL;			
+		}
 
+		// populate contents and marked
+		for ( size_t j=0; j<size; j++ ){
 
+			switch( line[j] ){
+
+				case '.':
+					brd->contents[i]->row[j] = '.';
+					brd->marked[i*size+j] = false;
+					break;
+
+				case '0':
+					brd->contents[i]->row[j] = '0';
+					brd->marked[i*size+j] = true;
+					break;
+
+				case '1':
+					brd->contents[i]->row[j] = '1';
+					brd->marked[i*size+j] = true;
+					break;
+
+				default:
+					fprintf( stderr, "Error: invalid character found on line %lu.\n", i+1 );
+					destroy_BinairoBoard( brd );
+					return NULL;
+
+			}
+
+		}
+
+		free( line );
 
 	}
 
-
-
-
-
-    return NULL; 
-    
+    return brd;     
 
 }
 
+
+static void print_border( size_t dim, FILE* stream ){
+
+	fputc( '+', stream );
+	for( size_t j=0; j<dim; j++ )
+		fputs( "---+", stream );
+
+	fputc( '\n', stream );	
+}
+
+
 /// pretty print the board
-void print_BinairoBoard( BinairoBoard brd ){}
+void print_BinairoBoard( BinairoBoard brd, FILE* stream ){
+
+	size_t i,j;
+
+	// print top border
+	print_border( brd->dim, stream );
+
+	// print contents
+	for( i=0; i<brd->dim; i++ ){
+		fputc( '|', stream );
+		for( j=0; j<brd->dim; j++ )
+			fputs( "   |", stream );
+		fputc( '\n', stream );
+		fputc( '|', stream );
+		for( j=0; j<brd->dim; j++ ) 
+			fprintf( stream, " %c |", brd->contents[i]->row[j] );
+		fputc( '\n', stream );
+		fputc( '|', stream );
+		for( j=0; j<brd->dim; j++ )
+			fputs( "   |", stream );
+		fputc( '\n', stream );
+		
+		// print inner (and bottom) border
+		print_border( brd->dim, stream );	
+	}
+
+}
 
 
 /// destroy Binairo Board
-void destroy_BinairoBoard( BinairoBoard board ){}
+///
+/// free:
+///		brd->marked
+///		brd->contents
+///			contents->row
+void destroy_BinairoBoard( BinairoBoard brd ){
 
+	if( brd->marked != NULL )
+		free( brd->marked );
 
+	if( brd->contents != NULL ){
 
+		for( size_t i=0; i<brd->dim; i++ ){
+
+			if( brd->contents[i] != NULL ){
+
+				if( brd->contents[i]->row != NULL )
+					free( brd->contents[i]->row );
+
+				free( brd->contents[i] );
+
+			}
+
+		}
+
+		free( brd->contents );
+	}
+
+	free( brd );
+
+}

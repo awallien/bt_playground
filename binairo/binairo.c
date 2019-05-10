@@ -43,12 +43,15 @@ int main( int argc, char* argv[] ){
 
     
     BinairoBoard brd = create_BinairoBoard( config_file );
-
+    
 	if( brd == NULL ){
+        fprintf( stderr, "Error: Unable to create Binairo Board\n");
 		fclose( config_file );
 		return EXIT_FAILURE;
 	}
 
+	print_BinairoBoard( brd, stdout );
+	destroy_BinairoBoard( brd );
 
     fclose( config_file );    
 

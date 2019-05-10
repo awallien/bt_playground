@@ -4,7 +4,7 @@
 ///
 /// description:
 ///     header file that contains the data structure and implementations
-///     for a Binairo puzzle board
+///     for a Binairo puzzle board; follows ADT Management
 /// 
 /// author:
 ///     asw8675
@@ -37,6 +37,16 @@ BinairoBoard create_BinairoBoard( FILE* config_file );
 
 
 ///
+/// print_BinairoBoard
+///
+/// pretty prints the binairo board to desired output stream
+///
+/// @param board - the board to print out
+///
+void print_BinairoBoard( BinairoBoard board, FILE* stream );
+
+
+///
 /// destroy_BinairoBoard
 ///
 /// destroys the specified heap, deallocating any
@@ -45,5 +55,6 @@ BinairoBoard create_BinairoBoard( FILE* config_file );
 /// @param board - the board to free
 /// 
 void destroy_BinairoBoard( BinairoBoard board );
+
 
 #endif  //_BINAIRO_BOARD_H
