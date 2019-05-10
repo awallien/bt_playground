@@ -20,8 +20,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "getline.h"
-
+/// representation of a single row on a board
 typedef struct RowStruct {
 
 	char* row;
@@ -34,12 +33,13 @@ typedef struct RowStruct {
 struct BinairoBoardStruct {
 
     RowInfo** contents;     /// filled content on board, either '0' or '1'
-    bool* marked;        	/// is the board already marked from the given config
+    bool* marked;        	/// is the board already marked from the given config file
     size_t dim;				/// dimension of the board
 
 };
 
 #include "binairo_board.h"
+#include "get_line.h"
 
 /// create a Binairo puzzle board from config file
 BinairoBoard create_BinairoBoard( FILE* config_file ){
@@ -47,7 +47,7 @@ BinairoBoard create_BinairoBoard( FILE* config_file ){
     // collect dimensions of board
     char* line = NULL;
     size_t dummy;
-    getline( &line, &dummy, config_file );
+    get_line( &line, &dummy, config_file );
     
 	if ( line == NULL ){
 		fprintf( stderr, "Error: unable to read size of board.\n");
@@ -89,10 +89,11 @@ BinairoBoard create_BinairoBoard( FILE* config_file ){
 
 		char* line = NULL;
 		size_t dummy;
-		getline( &line, &dummy, config_file );
+		get_line( &line, &dummy, config_file );
 
 		if( strlen( line ) < size + 1 ){
 			fprintf( stderr, "Error: line %lu of configuration file is invalid.", i+1 );
+			free( line );
 			destroy_BinairoBoard( brd );
 			return NULL;			
 		}
@@ -109,17 +110,20 @@ BinairoBoard create_BinairoBoard( FILE* config_file ){
 
 				case '0':
 					brd->contents[i]->row[j] = '0';
+					brd->contents[i]->num_of_0s++;
 					brd->marked[i*size+j] = true;
 					break;
 
 				case '1':
 					brd->contents[i]->row[j] = '1';
+					brd->contents[i]->num_of_1s++;
 					brd->marked[i*size+j] = true;
 					break;
 
 				default:
 					fprintf( stderr, "Error: invalid character found on line %lu.\n", i+1 );
 					destroy_BinairoBoard( brd );
+					free( line );
 					return NULL;
 
 			}
@@ -135,6 +139,14 @@ BinairoBoard create_BinairoBoard( FILE* config_file ){
 }
 
 
+///
+/// print_border
+///
+/// helper function to print the border of the binairo board
+///
+/// @param dim		the dimension of the board
+/// @param stream	the place to print the border
+///
 static void print_border( size_t dim, FILE* stream ){
 
 	fputc( '+', stream );

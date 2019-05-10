@@ -30,6 +30,7 @@
 ///
 int main( int argc, char* argv[] ){
 
+	// arg and file checking
     if ( argc != 2 ){
         fprintf( stderr, "Usage: binario config-file\n" );
         return EXIT_FAILURE;
@@ -41,7 +42,7 @@ int main( int argc, char* argv[] ){
         return EXIT_FAILURE; 
     }
 
-    
+   	// initial board 
     BinairoBoard brd = create_BinairoBoard( config_file );
     
 	if( brd == NULL ){

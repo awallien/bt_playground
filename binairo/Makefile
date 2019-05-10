@@ -1,5 +1,5 @@
 #
-# Created by gmakemake (Ubuntu Jul 25 2014) on Thu May  9 16:45:03 2019
+# Created by gmakemake (Ubuntu Jul 25 2014) on Fri May 10 03:34:40 2019
 #
 
 #
@@ -43,20 +43,20 @@ COMPILE.cc = $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c
 CPP = $(CPP) $(CPPFLAGS)
 ########## Default flags (redefine these with a header.mak file if desired)
 CXXFLAGS =	-ggdb
-CFLAGS =	-ggdb -Wextra -Wall -pedantic
+CFLAGS =	-ggdb -Wall -Wextra -pedantic -std=c99
 CLIBFLAGS =	-lm
 CCLIBFLAGS =	
 ########## End of default flags
 
 
 CPP_FILES =	
-C_FILES =	binairo.c binairo_board.c
+C_FILES =	binairo.c binairo_board.c get_line.c
 PS_FILES =	
 S_FILES =	
-H_FILES =	binairo_board.h
+H_FILES =	binairo_board.h get_line.h
 SOURCEFILES =	$(H_FILES) $(CPP_FILES) $(C_FILES) $(S_FILES)
 .PRECIOUS:	$(SOURCEFILES)
-OBJFILES =	binairo_board.o 
+OBJFILES =	binairo_board.o get_line.o 
 
 #
 # Main targets
@@ -72,7 +72,8 @@ binairo:	binairo.o $(OBJFILES)
 #
 
 binairo.o:	binairo_board.h
-binairo_board.o:	binairo_board.h
+binairo_board.o:	binairo_board.h get_line.h
+get_line.o:	get_line.h
 
 #
 # Housekeeping

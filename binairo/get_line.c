@@ -7,7 +7,7 @@
 #include <errno.h>
 #include <stdint.h>
 
-#include "getline.h"
+#include "get_line.h"
 
 #if !(defined _POSIX_C_SOURCE)
 typedef long int ssize_t;
@@ -21,7 +21,7 @@ typedef long int ssize_t;
 #define SSIZE_MAX (SIZE_MAX >> 1)
 #endif
 
-ssize_t getline(char **pline_buf, size_t *pn, FILE *fin)
+ssize_t get_line(char **pline_buf, size_t *pn, FILE *fin)
 {
   const size_t INITALLOC = 16;
   const size_t ALLOCSTEP = 16;
