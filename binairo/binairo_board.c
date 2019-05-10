@@ -139,7 +139,7 @@ static void print_border( size_t dim, FILE* stream ){
 
 	fputc( '+', stream );
 	for( size_t j=0; j<dim; j++ )
-		fputs( "---+", stream );
+		fputs( "-+", stream );
 
 	fputc( '\n', stream );	
 }
@@ -156,16 +156,8 @@ void print_BinairoBoard( BinairoBoard brd, FILE* stream ){
 	// print contents
 	for( i=0; i<brd->dim; i++ ){
 		fputc( '|', stream );
-		for( j=0; j<brd->dim; j++ )
-			fputs( "   |", stream );
-		fputc( '\n', stream );
-		fputc( '|', stream );
 		for( j=0; j<brd->dim; j++ ) 
-			fprintf( stream, " %c |", brd->contents[i]->row[j] );
-		fputc( '\n', stream );
-		fputc( '|', stream );
-		for( j=0; j<brd->dim; j++ )
-			fputs( "   |", stream );
+			fprintf( stream, "%c|", brd->contents[i]->row[j] );
 		fputc( '\n', stream );
 		
 		// print inner (and bottom) border
