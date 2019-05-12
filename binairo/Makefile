@@ -42,7 +42,7 @@ COMPILE.c = $(CC) $(CFLAGS) $(CPPFLAGS) -c
 COMPILE.cc = $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c
 CPP = $(CPP) $(CPPFLAGS)
 ########## Default flags (redefine these with a header.mak file if desired)
-CXXFLAGS =	-ggdb
+CXXFLAGS =	-ggdb -O3
 CFLAGS =	-ggdb -Wall -Wextra -pedantic -std=c99
 CLIBFLAGS =	-lm
 CCLIBFLAGS =	

@@ -12,7 +12,8 @@
 ///     4/25/19
 ///
 
-#define _DEFAULT_SOURCE
+
+//#define _DEFAULT_SOURCE
 #include <assert.h>
 #include <ctype.h>
 #include <stdbool.h>
@@ -20,14 +21,16 @@
 #include <stdlib.h>
 #include <string.h>
 
+
 /// representation of a single row on a board
 typedef struct RowStruct {
 
-	char* row;
-	size_t num_of_0s;
-	size_t num_of_1s;
+	char* row;				/// contents in this row
+	size_t num_of_0s;		/// number of 0s in row
+	size_t num_of_1s;		/// number of 1s in row
 
 } RowInfo;
+
 
 /// data structure for board
 struct BinairoBoardStruct {
@@ -38,8 +41,10 @@ struct BinairoBoardStruct {
 
 };
 
+
 #include "binairo_board.h"
 #include "get_line.h"
+
 
 /// create a Binairo puzzle board from config file
 BinairoBoard create_BinairoBoard( FILE* config_file ){
@@ -91,8 +96,9 @@ BinairoBoard create_BinairoBoard( FILE* config_file ){
 		size_t dummy;
 		get_line( &line, &dummy, config_file );
 
-		if( strlen( line ) < size + 1 ){
-			fprintf( stderr, "Error: line %lu of configuration file is invalid.", i+1 );
+		// simple invalid checking
+		if( strlen( line ) != size + 1 ){
+			fprintf( stderr, "Error: line %zu of configuration file is invalid.\n", i+1 );
 			free( line );
 			destroy_BinairoBoard( brd );
 			return NULL;			
@@ -120,8 +126,9 @@ BinairoBoard create_BinairoBoard( FILE* config_file ){
 					brd->marked[i*size+j] = true;
 					break;
 
+				// unknown character found
 				default:
-					fprintf( stderr, "Error: invalid character found on line %lu.\n", i+1 );
+					fprintf( stderr, "Error: invalid character found on line %zu.\n", i+1 );
 					destroy_BinairoBoard( brd );
 					free( line );
 					return NULL;
