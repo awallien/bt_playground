@@ -63,8 +63,8 @@ BinairoBoard create_BinairoBoard( FILE* config_file ){
 
 	free( line );
 
-	if( size <= 0 ){
-        fprintf( stderr, "Error: dimension of board should be greater than 0.\n" );
+	if( size <= 1 ){
+        fprintf( stderr, "Error: dimension of board should be greater than 1.\n" );
 		return NULL;
     }
 	

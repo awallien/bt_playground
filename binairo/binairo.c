@@ -14,7 +14,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #include "binairo_board.h"
 
@@ -44,7 +43,7 @@ int main( int argc, char* argv[] ){
 
    	// initial board 
     BinairoBoard brd = create_BinairoBoard( config_file );
-    
+ 
 	if( brd == NULL ){
         fprintf( stderr, "Error: Unable to create Binairo Board\n");
 		fclose( config_file );
