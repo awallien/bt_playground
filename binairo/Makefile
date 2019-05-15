@@ -1,5 +1,5 @@
 #
-# Created by gmakemake (Ubuntu Jul 25 2014) on Fri May 10 03:34:40 2019
+# Created by gmakemake (Ubuntu Jul 25 2014) on Wed May 15 15:51:12 2019
 #
 
 #
@@ -41,12 +41,14 @@ LINK.cc = $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS)
 COMPILE.c = $(CC) $(CFLAGS) $(CPPFLAGS) -c
 COMPILE.cc = $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c
 CPP = $(CPP) $(CPPFLAGS)
-########## Default flags (redefine these with a header.mak file if desired)
+########## Flags from header.mak
+
 CXXFLAGS =	-ggdb -O3
-CFLAGS =	-ggdb -Wall -Wextra -pedantic -std=c99
+CFLAGS =	-ggdb -Wall -Wextra -pedantic -std=c99 -O3
 CLIBFLAGS =	-lm
 CCLIBFLAGS =	
-########## End of default flags
+
+########## End of flags from header.mak
 
 
 CPP_FILES =	
@@ -71,7 +73,7 @@ binairo:	binairo.o $(OBJFILES)
 # Dependencies
 #
 
-binairo.o:	binairo_board.h
+binairo.o:	binairo_board.h binairo_bt.h
 binairo_board.o:	binairo_board.h get_line.h
 binairo_bt.o:	binairo_board.h binairo_bt.h
 get_line.o:	get_line.h

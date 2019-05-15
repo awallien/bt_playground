@@ -21,6 +21,8 @@
 #include "binairo_bt.h"
 
 
+#define BLANK '.'
+
 /// digits to put on the board for solving and validating
 static char digits[2] = {'0','1'};
 
@@ -95,7 +97,7 @@ static bool bt_solve( int status ) {
 		}
 	
 		// invalid check, erase digit and backtrack
-		erase_BinairoBoard( brd, status );
+		put_BinairoBoard( brd, status, BLANK );
 		return bt_solve( status-1 );
 	}
 

@@ -235,10 +235,3 @@ void put_BinairoBoard( BinairoBoard b, size_t cell, char digit ){
 }
 
 
-/// erase digit on board
-void erase_BinairoBoard( BinairoBoard b, size_t cell ){
-	assert( b );
-	b->contents[cell/b->dim]->row[cell%b->dim] = '.';
-}
-
-
