@@ -13,14 +13,18 @@
 ///     4/26/19
 ///
 
+
 #ifndef _BINAIRO_BOARD_H
 #define _BINAIRO_BOARD_H
+
 
 #include <stdbool.h>
 #include <stdlib.h>
 
+
 /// data structure type for a Binairo Board
 typedef struct BinairoBoardStruct* BinairoBoard;
+
 
 ///
 /// create_BinairoBoard
@@ -48,6 +52,7 @@ BinairoBoard create_BinairoBoard( FILE* config_file );
 ///
 size_t dim_BinairoBoard( BinairoBoard brd );
 
+
 ///
 /// is_marked_BinairoBoard
 ///
@@ -60,6 +65,37 @@ size_t dim_BinairoBoard( BinairoBoard brd );
 /// @return - true if the cell on board is initially marked; otherwise, false
 ///
 bool is_marked_BinairoBoard( BinairoBoard board, size_t cell );
+
+
+///
+/// put_BinairoBoard
+///
+/// put a digit on a binairo board
+///
+/// @param board - the binairo board
+/// @param cell - the cell to put the digit on
+/// @param digit - the digit
+///
+/// @pre - the cell is a valid number within the
+///		boundary of the board
+/// @pre - the digit is valid, either a '0' or '1'
+///
+void put_BinairoBoard( BinairoBoard board, size_t cell, char digit );
+
+
+///
+/// erase_BinairoBoard
+///
+/// erase a digit on a binairo board
+///
+/// @param board - the binairo board
+/// @param cell - the cell to erase a digit
+///
+/// @pre - the cell is a valid number within the
+///		boundary of the board
+///
+void erase_BinairoBoard( BinairoBoard board, size_t cell );
+
 
 ///
 /// print_BinairoBoard

@@ -47,7 +47,6 @@ struct BinairoBoardStruct {
 
 /// create a Binairo puzzle board from config file
 BinairoBoard create_BinairoBoard( FILE* config_file ){
-    
     // collect dimensions of board
     char* line = NULL;
     size_t dummy;
@@ -143,7 +142,6 @@ BinairoBoard create_BinairoBoard( FILE* config_file ){
 	}
 
     return brd;     
-
 }
 
 
@@ -156,7 +154,6 @@ BinairoBoard create_BinairoBoard( FILE* config_file ){
 /// @param stream	the place to print the border
 ///
 static void print_border( size_t dim, FILE* stream ){
-
 	fputc( '+', stream );
 	for( size_t j=0; j<dim; j++ )
 		fputs( "-+", stream );
@@ -167,7 +164,6 @@ static void print_border( size_t dim, FILE* stream ){
 
 /// pretty print the board
 void print_BinairoBoard( BinairoBoard brd, FILE* stream ){
-
 	size_t i,j;
 
 	// print top border
@@ -183,7 +179,6 @@ void print_BinairoBoard( BinairoBoard brd, FILE* stream ){
 		// print inner (and bottom) border
 		print_border( brd->dim, stream );	
 	}
-
 }
 
 
@@ -194,7 +189,6 @@ void print_BinairoBoard( BinairoBoard brd, FILE* stream ){
 ///		brd->contents
 ///			contents->row
 void destroy_BinairoBoard( BinairoBoard brd ){
-
 	if( brd->marked != NULL )
 		free( brd->marked );
 
@@ -217,20 +211,34 @@ void destroy_BinairoBoard( BinairoBoard brd ){
 	}
 
 	free( brd );
-
 }
 
 
 /// the dimension of the board
-size_t dim_BinairoBoard( BinairoBoard brd ){ 
-		return brd->dim; 
+size_t dim_BinairoBoard( BinairoBoard b ){ 
+	assert( b );
+	return b->dim; 
 }
 
 
 /// is the cell initially marked on the board?
 bool is_marked_BinairoBoard( BinairoBoard b, size_t cell ){ 
-		return b->marked[cell];
+	assert( b );
+	return b->marked[cell];
 }
 
+
+/// put digit on board
+void put_BinairoBoard( BinairoBoard b, size_t cell, char digit ){
+	assert( b );
+	b->contents[cell/b->dim]->row[cell%b->dim] = digit;
+}
+
+
+/// erase digit on board
+void erase_BinairoBoard( BinairoBoard b, size_t cell ){
+	assert( b );
+	b->contents[cell/b->dim]->row[cell%b->dim] = '.';
+}
 
 
