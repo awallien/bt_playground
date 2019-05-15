@@ -57,10 +57,10 @@ int main( int argc, char* argv[] ){
 
 	// finding a solution
 	if( !solve( brd ) ){
-		printf( "\nNo Solution!\n" );
+		printf( "\nNo Solution!\n\n" );
 	}
 	else{
-		printf( "Solution:\n" );
+		printf( "\nSolution:\n" );
 		print_BinairoBoard( brd, stdout );	
 	}	
 
