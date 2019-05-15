@@ -13,7 +13,6 @@
 ///
 
 
-//#define _DEFAULT_SOURCE
 #include <assert.h>
 #include <ctype.h>
 #include <stdbool.h>
@@ -97,7 +96,9 @@ BinairoBoard create_BinairoBoard( FILE* config_file ){
 		get_line( &line, &dummy, config_file );
 
 		// simple invalid checking
-		if( strlen( line ) != size + 1 ){
+		// linux - does not include /r (+1 for \n)
+		// windows - does include /r (+2)
+		if( strlen( line ) < size + 1 ){
 			fprintf( stderr, "Error: line %zu of configuration file is invalid.\n", i+1 );
 			free( line );
 			destroy_BinairoBoard( brd );
@@ -218,3 +219,18 @@ void destroy_BinairoBoard( BinairoBoard brd ){
 	free( brd );
 
 }
+
+
+/// the dimension of the board
+size_t dim_BinairoBoard( BinairoBoard brd ){ 
+		return brd->dim; 
+}
+
+
+/// is the cell initially marked on the board?
+bool is_marked_BinairoBoard( BinairoBoard b, size_t cell ){ 
+		return b->marked[cell];
+}
+
+
+

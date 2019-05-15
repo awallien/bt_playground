@@ -50,13 +50,13 @@ CCLIBFLAGS =
 
 
 CPP_FILES =	
-C_FILES =	binairo.c binairo_board.c get_line.c
+C_FILES =	binairo.c binairo_board.c binairo_bt.c get_line.c
 PS_FILES =	
 S_FILES =	
-H_FILES =	binairo_board.h get_line.h
+H_FILES =	binairo_board.h binairo_bt.h get_line.h
 SOURCEFILES =	$(H_FILES) $(CPP_FILES) $(C_FILES) $(S_FILES)
 .PRECIOUS:	$(SOURCEFILES)
-OBJFILES =	binairo_board.o get_line.o 
+OBJFILES =	binairo_board.o binairo_bt.o get_line.o 
 
 #
 # Main targets
@@ -73,6 +73,7 @@ binairo:	binairo.o $(OBJFILES)
 
 binairo.o:	binairo_board.h
 binairo_board.o:	binairo_board.h get_line.h
+binairo_bt.o:	binairo_board.h binairo_bt.h
 get_line.o:	get_line.h
 
 #

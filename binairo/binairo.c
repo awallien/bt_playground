@@ -16,6 +16,7 @@
 #include <stdlib.h>
 
 #include "binairo_board.h"
+#include "binairo_bt.h"
 
 ///
 /// takes a configuration file to configure the board and
@@ -50,9 +51,20 @@ int main( int argc, char* argv[] ){
 		return EXIT_FAILURE;
 	}
 
+	// print the initial board
+	puts("\nInitial Board:\n");
 	print_BinairoBoard( brd, stdout );
-	destroy_BinairoBoard( brd );
 
+	// finding a solution
+	if( !solve( brd ) ){
+		printf( "\nNo Solution!\n" );
+	}
+	else{
+		printf( "Solution:\n" );
+		print_BinairoBoard( brd, stdout );	
+	}	
+
+	destroy_BinairoBoard( brd );
     fclose( config_file );    
 
     return EXIT_SUCCESS;
