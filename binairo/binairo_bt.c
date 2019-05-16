@@ -21,15 +21,9 @@
 #include "binairo_bt.h"
 
 
-#define BLANK '.'
-
-/// digits to put on the board for solving and validating
-static char digits[2] = {'0','1'};
-
-
 /// the binairo board to be solved
 static BinairoBoard brd;
-
+static size_t dim;
 
 ///
 /// is_goal
@@ -38,12 +32,66 @@ static BinairoBoard brd;
 /// absolutely filled up and everything
 /// is valid
 /// 
-/// @param area the area of the board
-/// @param status the current cell on the board
+/// @param area - the area of the board
+/// @param status - the current cell on the board
 ///
-/// @return current cell on board is last cell on board
+/// @return - current cell on board is last cell on board
 ///
 static bool is_goal( size_t area, size_t status ) { return status == area; }
+
+
+///
+/// chk_[left,right,up,down,mid]_adj
+///
+/// list of functions that validates a digit being
+///	put in a cell on the board by checking the adjacent
+/// cells
+///
+/// @param status - the cell being validated
+/// @param digit - the digit in the cell
+///
+/// @return - true if digit can be put in that cell; otherwise, false
+///
+static bool chk_left_adj( int status, Digit digit ){
+	char idx = 2;
+	char count = 0;
+	while( (--status)%(int)dim >= 0 && idx-- )
+		count += get_BinairoBoard( brd, status ) == digit ? 1 : 0;
+	return count != 2; 
+}
+
+static bool chk_right_adj( size_t status, Digit digit ){
+	char idx = 2;
+	char count = 0;
+	while( (++status)%dim != 0 && idx-- )
+		count += get_BinairoBoard( brd, status ) == digit ? 1 : 0;
+	return count != 2;
+}
+
+static bool chk_up_adj( int status, Digit digit ){
+	char idx = 2;
+	char count = 0;
+	while( (status-=dim) > 0 && idx-- )
+		count += get_BinairoBoard( brd, status ) == digit ? 1 : 0;  
+	return count != 2;
+}
+
+static bool chk_down_adj( int status, Digit digit ){
+	char idx = 2;
+	char count = 0;
+	while( (status+=dim) >(int)(dim*dim) && idx-- )
+		count += get_BinairoBoard( brd, status ) == digit ? 1 : 0;
+	return count != 2;	
+}
+
+static bool chk_mid_adj( int status, Digit digit ){
+	char count = 0;
+	if( (status-1)%dim != 0 && get_BinairoBoard( brd, status ) == digit )
+		count++;
+	if( (status+1)%dim != 0 && get_BinairoBoard( brd, status ) == digit )
+		count++;
+	return count != 2;
+}
 
 
 ///
@@ -62,18 +110,16 @@ static bool is_goal( size_t area, size_t status ) { return status == area; }
 ///
 /// @return true if the digit at cell is valid; otherwise, false
 ///
-static bool is_valid( int status ) { 
+static bool is_valid( size_t status ) { 
+
+	Digit d = get_BinairoBoard( brd, status );
 	
-	int x = status / dim_BinairoBoard( brd );
-	int y = status % dim_BinairoBoard( brd );
+	bool chk = chk_left_adj( status, d ) && chk_right_adj( status, d ) &&
+				chk_up_adj( status, d ) && chk_down_adj( status, d ) &&
+				chk_mid_adj( status, d );
 
-	//top row cell
-	if( x == 0 ){}
-	//bottom row cell
-	else if( x == dim_BinairoBoard( brd )-1 ){}
-	// any row in between
-	else{}
-
+	return chk;
+	
 }
 
 
@@ -88,7 +134,7 @@ static bool is_valid( int status ) {
 ///
 static bool bt_solve( int status ) {
 	// goal reached
-	if( is_goal( dim_BinairoBoard( brd )*dim_BinairoBoard( brd ), status ) )
+	if( is_goal( dim*dim, status ) )
 		return true;
 	
 	// no solution found
@@ -101,10 +147,10 @@ static bool bt_solve( int status ) {
 	
 	// lay digits and validate
 	else{
-		for( int i=0; i<2; i++ ){
+		for( Digit i=ZERO; i<=ONE; i++ ){
 
 			// put digit in spot
-			put_BinairoBoard( brd, status, digits[i] );
+			put_BinairoBoard( brd, status, i );
 
 			// advance a depth if valid		
 			if( is_valid( status ) )
@@ -131,6 +177,7 @@ static void apply_heuristics( ){}
 bool solve( BinairoBoard b ) {
 	// initialize board
 	brd = b;
+	dim = dim_BinairoBoard( b );
 
 	// apply heuristics on board
 	apply_heuristics( );

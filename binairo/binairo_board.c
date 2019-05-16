@@ -228,10 +228,70 @@ bool is_marked_BinairoBoard( BinairoBoard b, size_t cell ){
 }
 
 
+#define ROW( b, cell )		b->contents[cell/b->dim]  
+#define SPOT( b, cell )		b->contents[cell/b->dim]->row[cell%b->dim]
+
 /// put digit on board
-void put_BinairoBoard( BinairoBoard b, size_t cell, char digit ){
+void put_BinairoBoard( BinairoBoard b, size_t cell, Digit digit ){
 	assert( b );
-	b->contents[cell/b->dim]->row[cell%b->dim] = digit;
+
+	// check spot for digit for update
+	switch( SPOT( b, cell ) ){
+		case '0':
+			ROW( b, cell )->num_of_0s--;
+			break;
+
+		case '1':
+			ROW( b, cell )->num_of_1s--;
+			break;
+	}
+
+	// update cell and counter
+	switch( digit ){
+		case ZERO:
+			SPOT( b, cell ) = '0';
+			ROW( b, cell )->num_of_0s++;
+			break;
+
+		case ONE:
+			SPOT( b, cell ) = '1';
+			ROW( b, cell )->num_of_1s++;
+			break;
+
+		case BLANK:
+			SPOT( b, cell ) = '.';
+
+	}
 }
 
 
+/// get digit from a cell on board
+Digit get_BinairoBoard( BinairoBoard b, size_t cell ){
+	assert( b );
+	char d = SPOT( b, cell );
+	switch( d ){
+		case '0':
+			return ZERO;
+		case '1':
+			return ONE;
+		default:
+			return BLANK;
+	}
+}
+
+
+/// get number of digit in a row
+size_t numberof_BinairoBoard( BinairoBoard b, size_t row_number, Digit d  ){
+	assert( b );
+	switch( d ){
+		case ONE:
+			return b->contents[row_number]->num_of_1s;
+		case ZERO:
+			return b->contents[row_number]->num_of_0s;
+		case BLANK:
+			return b->dim - b->contents[row_number]->num_of_0s -
+						b->contents[row_number]->num_of_1s;
+
+	}
+	return 0;
+}

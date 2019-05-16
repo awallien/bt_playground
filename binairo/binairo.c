@@ -52,7 +52,7 @@ int main( int argc, char* argv[] ){
 	}
 
 	// print the initial board
-	puts("\nInitial Board:\n");
+	puts("\nInitial Board:");
 	print_BinairoBoard( brd, stdout );
 
 	// finding a solution
@@ -62,6 +62,7 @@ int main( int argc, char* argv[] ){
 	else{
 		printf( "\nSolution:\n" );
 		print_BinairoBoard( brd, stdout );	
+		puts("");
 	}	
 
 	destroy_BinairoBoard( brd );
