@@ -25,8 +25,8 @@
 typedef struct RowStruct {
 
 	char* row;				/// contents in this row
-	size_t num_of_0s;		/// number of 0s in row
-	size_t num_of_1s;		/// number of 1s in row
+	int num_of_0s;			/// number of 0s in row
+	int num_of_1s;			/// number of 1s in row
 
 } RowInfo;
 
@@ -36,7 +36,7 @@ struct BinairoBoardStruct {
 
     RowInfo** contents;     /// filled content on board, either '0' or '1'
     bool* marked;        	/// is the board already marked from the given config file
-    size_t dim;				/// dimension of the board
+    int dim;				/// dimension of the board
 
 };
 
@@ -164,7 +164,7 @@ static void print_border( size_t dim, FILE* stream ){
 
 /// pretty print the board
 void print_BinairoBoard( BinairoBoard brd, FILE* stream ){
-	size_t i,j;
+	int i,j;
 
 	// print top border
 	print_border( brd->dim, stream );
@@ -194,7 +194,7 @@ void destroy_BinairoBoard( BinairoBoard brd ){
 
 	if( brd->contents != NULL ){
 
-		for( size_t i=0; i<brd->dim; i++ ){
+		for( int i=0; i<brd->dim; i++ ){
 
 			if( brd->contents[i] != NULL ){
 
@@ -215,7 +215,7 @@ void destroy_BinairoBoard( BinairoBoard brd ){
 
 
 /// the dimension of the board
-size_t dim_BinairoBoard( BinairoBoard b ){ 
+int dim_BinairoBoard( BinairoBoard b ){ 
 	assert( b );
 	return b->dim; 
 }

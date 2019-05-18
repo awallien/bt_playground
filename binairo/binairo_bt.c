@@ -23,7 +23,7 @@
 
 /// the binairo board to be solved
 static BinairoBoard brd;
-static size_t dim;
+static int dim;
 
 ///
 /// is_goal
@@ -37,7 +37,7 @@ static size_t dim;
 ///
 /// @return - current cell on board is last cell on board
 ///
-static bool is_goal( size_t area, size_t status ) { return status == area; }
+static bool is_goal( int area, int status ) { return status == area; }
 
 
 ///
@@ -55,12 +55,12 @@ static bool is_goal( size_t area, size_t status ) { return status == area; }
 static bool chk_left_adj( int status, Digit digit ){
 	char idx = 2;
 	char count = 0;
-	while( (--status)%(int)dim >= 0 && idx-- )
+	while( status > 0 && (--status)%(int)dim >= 0 && idx-- )
 		count += get_BinairoBoard( brd, status ) == digit ? 1 : 0;
 	return count != 2; 
 }
 
-static bool chk_right_adj( size_t status, Digit digit ){
+static bool chk_right_adj( int status, Digit digit ){
 	char idx = 2;
 	char count = 0;
 	while( (++status)%dim != 0 && idx-- )
@@ -79,16 +79,20 @@ static bool chk_up_adj( int status, Digit digit ){
 static bool chk_down_adj( int status, Digit digit ){
 	char idx = 2;
 	char count = 0;
-	while( (status+=dim) >(int)(dim*dim) && idx-- )
+	while( (status+=dim) < dim*dim && idx-- )
 		count += get_BinairoBoard( brd, status ) == digit ? 1 : 0;
 	return count != 2;	
 }
 
+/// TODO: FIX THIS
 static bool chk_mid_adj( int status, Digit digit ){
 	char count = 0;
-	if( (status-1)%dim != 0 && get_BinairoBoard( brd, status ) == digit )
+	int cur = status % dim;
+	int left = (status-1)%dim;
+	int right = (status+1)%dim;
+	if( left < cur && get_BinairoBoard( brd, left ) == digit )
 		count++;
-	if( (status+1)%dim != 0 && get_BinairoBoard( brd, status ) == digit )
+	if( right > cur && get_BinairoBoard( brd, right ) == digit )
 		count++;
 	return count != 2;
 }
@@ -99,7 +103,7 @@ static bool chk_mid_adj( int status, Digit digit ){
 ///
 /// when a digit is put on a cell, it would check the following:
 /// 	if the piece is not at the end of the row:
-///			- check adjacent digits (horizontal and vertical)
+/// 		- check adjacent digits (horizontal and vertical)
 ///			- number of 0s == number of 1s
 ///		if cell spot is at end of row:
 ///			- check for unique row
@@ -110,19 +114,18 @@ static bool chk_mid_adj( int status, Digit digit ){
 ///
 /// @return true if the digit at cell is valid; otherwise, false
 ///
-static bool is_valid( size_t status ) { 
+static bool is_valid( int status ) { 
 
 	Digit d = get_BinairoBoard( brd, status );
 	
 	bool chk = chk_left_adj( status, d ) && chk_right_adj( status, d ) &&
-				chk_up_adj( status, d ) && chk_down_adj( status, d ) &&
-				chk_mid_adj( status, d );
+				chk_up_adj( status, d ) && chk_down_adj( status, d );
 
 	return chk;
 	
 }
 
-
+/// TODO: FIX THIS - for going forward and backward correctly
 ///
 /// bt_solve
 ///
@@ -153,8 +156,8 @@ static bool bt_solve( int status ) {
 			put_BinairoBoard( brd, status, i );
 
 			// advance a depth if valid		
-			if( is_valid( status ) )
-					return bt_solve( status+1 );
+			if( is_valid( status ) && bt_solve( status+1 ) )
+					return true;
 
 		}
 	

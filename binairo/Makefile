@@ -1,5 +1,5 @@
 #
-# Created by gmakemake (Ubuntu Jul 25 2014) on Wed May 15 15:51:12 2019
+# Created by gmakemake (Ubuntu Jul 25 2014) on Thu May 16 03:29:54 2019
 #
 
 #
@@ -43,8 +43,8 @@ COMPILE.cc = $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c
 CPP = $(CPP) $(CPPFLAGS)
 ########## Flags from header.mak
 
-CXXFLAGS =	-ggdb -O3
-CFLAGS =	-ggdb -Wall -Wextra -pedantic -std=c99 -O3
+CXXFLAGS =	-ggdb
+CFLAGS =	-ggdb -Wall -Wextra -pedantic -std=c99
 CLIBFLAGS =	-lm
 CCLIBFLAGS =	
 

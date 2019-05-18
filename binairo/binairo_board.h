@@ -53,7 +53,7 @@ BinairoBoard create_BinairoBoard( FILE* config_file );
 /// 
 /// @return - the dimension of the board
 ///
-size_t dim_BinairoBoard( BinairoBoard brd );
+int dim_BinairoBoard( BinairoBoard brd );
 
 
 ///
