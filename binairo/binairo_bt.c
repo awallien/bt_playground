@@ -44,7 +44,7 @@ static bool is_goal( int area, int status ) { return status == area; }
 /// chk_[left,right,up,down,mid]_adj
 ///
 /// list of functions that validates a digit being
-///	put in a cell on the board by checking the adjacent
+/// put in a cell on the board by checking the adjacent
 /// cells
 ///
 /// @param status - the cell being validated
@@ -84,13 +84,12 @@ static bool chk_down_adj( int status, Digit digit ){
 	return count != 2;	
 }
 
-/// TODO: FIX THIS
 static bool chk_mid_adj( int status, Digit digit ){
 	char count = 0;
 	int cur = status % dim;
 	int left = (status-1)%dim;
 	int right = (status+1)%dim;
-	if( left < cur && get_BinairoBoard( brd, left ) == digit )
+	if( left > 0 && left < cur && get_BinairoBoard( brd, left ) == digit )
 		count++;
 	if( right > cur && get_BinairoBoard( brd, right ) == digit )
 		count++;
@@ -118,14 +117,17 @@ static bool is_valid( int status ) {
 
 	Digit d = get_BinairoBoard( brd, status );
 	
-	bool chk = chk_left_adj( status, d ) && chk_right_adj( status, d ) &&
-				chk_up_adj( status, d ) && chk_down_adj( status, d );
+	bool chk = chk_left_adj( status, d ) && 
+		chk_right_adj( status, d ) && 
+		chk_up_adj( status, d ) && 
+		chk_down_adj( status, d ) && 
+		chk_mid_adj( status, d );
 
 	return chk;
 	
 }
 
-/// TODO: FIX THIS - for going forward and backward correctly
+/// TODO: for going forward and backward correctly, works for now
 ///
 /// bt_solve
 ///
@@ -159,11 +161,11 @@ static bool bt_solve( int status ) {
 			if( is_valid( status ) && bt_solve( status+1 ) )
 					return true;
 
+			// invalid check, erase digit and backtrack
+			put_BinairoBoard( brd, status, BLANK );
 		}
 	
-		// invalid check, erase digit and backtrack
-		put_BinairoBoard( brd, status, BLANK );
-		return bt_solve( status-1 );
+		return false;
 	}
 }
 
