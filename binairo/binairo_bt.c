@@ -98,12 +98,41 @@ static bool chk_mid_adj( int status, Digit digit ){
 
 
 ///
+/// chk_unique_[rows,cols]
+///
+/// checks if each row or column is unique to the other rows or columns
+/// previous to the current
+///
+/// @param status - the current cell spot
+///
+/// @return - true if all rows and columns are unique; otherwise, false
+///
+/// @pre - status should be a spot at an end of a row or a column 
+static bool chk_unique_rows( int status ){
+
+	if( status%dim != dim-1 )
+		return true;
+
+	int idx = status/dim;
+	while( idx-- > 0 ){
+					
+	}
+	return true;
+	
+}
+
+static bool chk_unique_cols( int status ){
+	return false;
+}
+
+
+///
 /// is_valid
 ///
 /// when a digit is put on a cell, it would check the following:
 /// 	if the piece is not at the end of the row:
 /// 		- check adjacent digits (horizontal and vertical)
-///			- number of 0s == number of 1s
+///			- number of 0s == number of 1s in row and col
 ///		if cell spot is at end of row:
 ///			- check for unique row
 ///		if cell spot is at end of column:
@@ -116,15 +145,26 @@ static bool chk_mid_adj( int status, Digit digit ){
 static bool is_valid( int status ) { 
 
 	Digit d = get_BinairoBoard( brd, status );
-	
-	bool chk = chk_left_adj( status, d ) && 
+
+	// check number of 0s == number of 1s in row
+	if( numberof_BinairoBoard( brd, status/dim, ZERO ) > dim/2 || 
+			numberof_BinairoBoard( brd, status/dim, ONE ) > dim/2 )
+		return false;	
+
+	// check adjacency	
+	if( !(	chk_left_adj( status, d ) && 
 		chk_right_adj( status, d ) && 
 		chk_up_adj( status, d ) && 
 		chk_down_adj( status, d ) && 
-		chk_mid_adj( status, d );
+		chk_mid_adj( status, d ) )
+	)
+		return false;
 
-	return chk;
-	
+	// at end of row
+	if( !chk_unique_rows( status ) )
+		return false;	
+
+	return true;	
 }
 
 /// TODO: for going forward and backward correctly, works for now

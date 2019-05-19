@@ -222,7 +222,7 @@ int dim_BinairoBoard( BinairoBoard b ){
 
 
 /// is the cell initially marked on the board?
-bool is_marked_BinairoBoard( BinairoBoard b, size_t cell ){ 
+bool is_marked_BinairoBoard( BinairoBoard b, int cell ){ 
 	assert( b );
 	return b->marked[cell];
 }
@@ -232,7 +232,7 @@ bool is_marked_BinairoBoard( BinairoBoard b, size_t cell ){
 #define SPOT( b, cell )		b->contents[cell/b->dim]->row[cell%b->dim]
 
 /// put digit on board
-void put_BinairoBoard( BinairoBoard b, size_t cell, Digit digit ){
+void put_BinairoBoard( BinairoBoard b, int cell, Digit digit ){
 	assert( b );
 
 	// check spot for digit for update
@@ -266,7 +266,7 @@ void put_BinairoBoard( BinairoBoard b, size_t cell, Digit digit ){
 
 
 /// get digit from a cell on board
-Digit get_BinairoBoard( BinairoBoard b, size_t cell ){
+Digit get_BinairoBoard( BinairoBoard b, int cell ){
 	assert( b );
 	char d = SPOT( b, cell );
 	switch( d ){
@@ -281,7 +281,7 @@ Digit get_BinairoBoard( BinairoBoard b, size_t cell ){
 
 
 /// get number of digit in a row
-size_t numberof_BinairoBoard( BinairoBoard b, size_t row_number, Digit d  ){
+int numberof_BinairoBoard( BinairoBoard b, int row_number, Digit d  ){
 	assert( b );
 	switch( d ){
 		case ONE:

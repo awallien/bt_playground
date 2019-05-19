@@ -18,11 +18,14 @@
 #define _BINAIRO_BOARD_H
 
 
-#include <stdbool.h>
-#include <stdlib.h>
+#include <stdbool.h>	// bool
+#include <stdlib.h>	// FILE
 
 
 /// enumeration representing the valid digits on board
+/// ZERO 	- '0'
+/// ONE 	- '1'
+/// BLANK 	- '.'
 typedef enum { ZERO, ONE, BLANK } Digit;
 
 /// data structure type for a Binairo Board
@@ -67,7 +70,7 @@ int dim_BinairoBoard( BinairoBoard brd );
 ///
 /// @return - true if the cell on board is initially marked; otherwise, false
 ///
-bool is_marked_BinairoBoard( BinairoBoard board, size_t cell );
+bool is_marked_BinairoBoard( BinairoBoard board, int cell );
 
 
 ///
@@ -79,7 +82,7 @@ bool is_marked_BinairoBoard( BinairoBoard board, size_t cell );
 /// @param cell - the cell to put the digit on
 /// @param digit - the specified digit
 ///
-void put_BinairoBoard( BinairoBoard board, size_t cell, Digit digit );
+void put_BinairoBoard( BinairoBoard board, int cell, Digit digit );
 
 
 ///
@@ -92,7 +95,7 @@ void put_BinairoBoard( BinairoBoard board, size_t cell, Digit digit );
 ///
 /// @return the digit at that cell on the board
 ///
-Digit get_BinairoBoard( BinairoBoard board, size_t cell );
+Digit get_BinairoBoard( BinairoBoard board, int cell );
 
 
 ///
@@ -106,7 +109,7 @@ Digit get_BinairoBoard( BinairoBoard board, size_t cell );
 ///
 /// @return the number of specified digit
 ///
-size_t numberof_BinairoBoard( BinairoBoard board, size_t row, Digit digit );
+int numberof_BinairoBoard( BinairoBoard board, int row, Digit digit );
 
 
 ///
