@@ -13,17 +13,38 @@
 ///		5/12/19
 ///
 
-
+#define _DEFAULT_SOURCE
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "binairo_bt.h"
+#include "display.h"
+
+#define BLANK printf( "       " )
+#define DELAY 500000
+#define DEBUG_TRUE if( debug ) { set_cur_pos( 2*dim+2, 1 ); BLANK; puts( "\rVALID" ); usleep( DELAY ); }
+#define DEBUG_FALSE if ( debug ) { set_cur_pos( 2*dim+2, 1 ); BLANK; puts( "\rINVALID" ); usleep( DELAY ); }
+#define DEBUG_BRD if( debug ) { set_cur_pos( 1, 1 ); print_BinairoBoard( brd, stdout ); }
 
 
 /// the binairo board to be solved
-static BinairoBoard brd;
-static int dim;
+static BinairoBoard brd = NULL;
+
+/// dimension of the board
+static int dim = 0;
+
+/// graphics debugging
+static bool debug = false;
+
+// initialize the backtracker
+void bt_initialize( BinairoBoard b, bool d ){
+	brd = b;
+	dim = dim_BinairoBoard( brd );
+	debug = d;
+}
+
 
 ///
 /// is_goal
@@ -55,7 +76,7 @@ static bool is_goal( int area, int status ) { return status == area; }
 static bool chk_left_adj( int status, Digit digit ){
 	char idx = 2;
 	char count = 0;
-	while( status > 0 && (--status)%(int)dim >= 0 && idx-- )
+	while( status > 0 && (--status)%dim >= 0 && idx-- )
 		count += get_BinairoBoard( brd, status ) == digit ? 1 : 0;
 	return count != 2; 
 }
@@ -115,7 +136,7 @@ static bool chk_unique_rows( int status ){
 
 	int idx = status/dim;
 	while( idx-- > 0 ){
-					
+	
 	}
 	return true;
 	
@@ -143,13 +164,15 @@ static bool chk_unique_cols( int status ){
 /// @return true if the digit at cell is valid; otherwise, false
 ///
 static bool is_valid( int status ) { 
-
 	Digit d = get_BinairoBoard( brd, status );
 
 	// check number of 0s == number of 1s in row
 	if( numberof_BinairoBoard( brd, status/dim, ZERO ) > dim/2 || 
-			numberof_BinairoBoard( brd, status/dim, ONE ) > dim/2 )
-		return false;	
+			numberof_BinairoBoard( brd, status/dim, ONE ) > dim/2 ){
+		DEBUG_FALSE;
+		return false;
+	}	
+
 
 	// check adjacency	
 	if( !(	chk_left_adj( status, d ) && 
@@ -157,15 +180,21 @@ static bool is_valid( int status ) {
 		chk_up_adj( status, d ) && 
 		chk_down_adj( status, d ) && 
 		chk_mid_adj( status, d ) )
-	)
+	){
+		DEBUG_FALSE;
 		return false;
+	}
 
 	// at end of row
-	if( !chk_unique_rows( status ) )
-		return false;	
+	if( !chk_unique_rows( status ) ){
+		DEBUG_FALSE;
+		return false;
+	}	
 
+	DEBUG_TRUE;
 	return true;	
 }
+
 
 /// TODO: for going forward and backward correctly, works for now
 ///
@@ -197,14 +226,16 @@ static bool bt_solve( int status ) {
 			// put digit in spot
 			put_BinairoBoard( brd, status, i );
 
+			DEBUG_BRD;
+
 			// advance a depth if valid		
 			if( is_valid( status ) && bt_solve( status+1 ) )
 					return true;
 
-			// invalid check, erase digit and backtrack
-			put_BinairoBoard( brd, status, BLANK );
 		}
-	
+		
+		put_BinairoBoard( brd, status, BLANK );	
+		DEBUG_BRD;
 		return false;
 	}
 }
@@ -219,10 +250,12 @@ static void apply_heuristics( ){}
 
 
 /// the "main" function for this backtracking 
-bool solve( BinairoBoard b ) {
-	// initialize board
-	brd = b;
-	dim = dim_BinairoBoard( b );
+bool solve( ) {
+
+	if( brd == NULL ){
+		fprintf( stderr, "Error: board has not been initialized for backtracker\n" );
+		return false;
+	}
 
 	// apply heuristics on board
 	apply_heuristics( );

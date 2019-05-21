@@ -12,57 +12,100 @@
 ///     4/25/19
 ///
 
+
+#include <getopt.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "binairo_board.h"
 #include "binairo_bt.h"
+#include "display.h"
+
+
+///
+/// print_usage
+///
+/// prints the usage message after an error in
+/// executing program occurs
+///
+static void print_usage(){
+	fprintf( stderr, "usage: binairo [-f filename] [-d]\n" ); 
+}
+
 
 ///
 /// takes a configuration file to configure the board and
 /// and performs backtracking to find solution to the puzzle
 ///
-/// @param argc - number of arguments: 1
-/// @param argv - [1] the configuration file
 ///
 /// @return EXIT_SUCCESS if program runs without errors;
 ///         otherwise, EXIT_FAILURE 
 ///
 int main( int argc, char* argv[] ){
+	FILE* config_file = stdin;
+	bool debug = false;
+	char flag;
 
-	// arg and file checking
-    if ( argc != 2 ){
-        fprintf( stderr, "Usage: binario config-file\n" );
-        return EXIT_FAILURE;
-    }
+	while( ( flag = getopt( argc, argv, "df:" ) ) != -1 ){
+		switch( flag ) {
+			case 'f':
+				config_file = fopen( optarg, "r" );
+				if( config_file == NULL ){
+					fprintf( stderr, "Argument for (-f): No such file or directory\n" );
+					return EXIT_FAILURE;
+				}
+				break;
+			case 'd':
+				debug = true;
+				break;
+			case '?':
+				print_usage();
+				return EXIT_FAILURE;
+		}
 
-    FILE* config_file = fopen( argv[1], "r" );
-    if( config_file == NULL ){
-        fprintf( stderr, "%s: No such file or directory\n", argv[1] );
-        return EXIT_FAILURE; 
-    }
+	}
 
    	// initial board 
     BinairoBoard brd = create_BinairoBoard( config_file );
- 
+
+	bt_initialize( brd, debug );
+
 	if( brd == NULL ){
         fprintf( stderr, "Error: Unable to create Binairo Board\n");
 		fclose( config_file );
 		return EXIT_FAILURE;
 	}
 
-	// print the initial board
-	puts("\nInitial Board:");
-	print_BinairoBoard( brd, stdout );
 
-	// finding a solution
-	if( !solve( brd ) ){
-		printf( "\nNo Solution!\n\n" );
-	}
+	// toggle debug flag
+	if( debug ){
+		clear();
+		if( !solve( ) ){
+			set_cur_pos( 2*dim_BinairoBoard( brd )+2, 1 );
+			puts( "No Solution!" );
+		}
+		else{
+			set_cur_pos( 2*dim_BinairoBoard( brd )+2, 1 );
+			puts( "Solution!" );
+		}	
+	}	
 	else{
-		printf( "\nSolution:\n" );
-		print_BinairoBoard( brd, stdout );	
-		puts("");
+
+		// print the initial board
+		puts("\nInitial Board:");
+		print_BinairoBoard( brd, stdout );
+
+		// finding a solution
+		bt_initialize( brd, debug );
+		if( !solve( ) ){
+			printf( "\nNo Solution!\n\n" );
+		}
+		else{
+			printf( "\nSolution:\n" );
+			print_BinairoBoard( brd, stdout );	
+			puts("");
+		}
 	}	
 
 	destroy_BinairoBoard( brd );
