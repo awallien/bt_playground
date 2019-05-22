@@ -1,16 +1,16 @@
 ///
 /// file: 
-///		binairo_bt.c
+///     binairo_bt.c
 ///
 /// author:
-///		awallien
+///     awallien
 ///
 /// description: 
-///		"class" that contains the implementation
-///		of a Binairo configuration backtracker
+///     "class" that contains the implementation
+///     of a Binairo configuration backtracker
 ///
 /// date:
-///		5/12/19
+///     5/12/19
 ///
 
 #define _DEFAULT_SOURCE
@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "binairo_board.h"
 #include "binairo_bt.h"
 #include "display.h"
 
@@ -40,9 +41,9 @@ static bool debug = false;
 
 // initialize the backtracker
 void bt_initialize( BinairoBoard b, bool d ){
-	brd = b;
-	dim = dim_BinairoBoard( brd );
-	debug = d;
+    brd = b;
+    dim = dim_BinairoBoard( brd );
+    debug = d;
 }
 
 
@@ -74,47 +75,47 @@ static bool is_goal( int area, int status ) { return status == area; }
 /// @return - true if digit can be put in that cell; otherwise, false
 ///
 static bool chk_left_adj( int status, Digit digit ){
-	char idx = 2;
-	char count = 0;
-	while( status > 0 && (--status)%dim >= 0 && idx-- )
-		count += get_BinairoBoard( brd, status ) == digit ? 1 : 0;
-	return count != 2; 
+    char idx = 2;
+    char count = 0;
+    while( status > 0 && (--status)%dim >= 0 && idx-- )
+        count += get_BinairoBoard( brd, status ) == digit ? 1 : 0;
+    return count != 2; 
 }
 
 static bool chk_right_adj( int status, Digit digit ){
-	char idx = 2;
-	char count = 0;
-	while( (++status)%dim != 0 && idx-- )
-		count += get_BinairoBoard( brd, status ) == digit ? 1 : 0;
-	return count != 2;
+    char idx = 2;
+    char count = 0;
+    while( (++status)%dim != 0 && idx-- )
+        count += get_BinairoBoard( brd, status ) == digit ? 1 : 0;
+    return count != 2;
 }
 
 static bool chk_up_adj( int status, Digit digit ){
-	char idx = 2;
-	char count = 0;
-	while( (status-=dim) > 0 && idx-- )
-		count += get_BinairoBoard( brd, status ) == digit ? 1 : 0;  
-	return count != 2;
+    char idx = 2;
+    char count = 0;
+    while( (status-=dim) > 0 && idx-- )
+        count += get_BinairoBoard( brd, status ) == digit ? 1 : 0;  
+    return count != 2;
 }
 
 static bool chk_down_adj( int status, Digit digit ){
-	char idx = 2;
-	char count = 0;
-	while( (status+=dim) < dim*dim && idx-- )
-		count += get_BinairoBoard( brd, status ) == digit ? 1 : 0;
-	return count != 2;	
+    char idx = 2;
+    char count = 0;
+    while( (status+=dim) < dim*dim && idx-- )
+        count += get_BinairoBoard( brd, status ) == digit ? 1 : 0;
+    return count != 2;  
 }
 
 static bool chk_mid_adj( int status, Digit digit ){
-	char count = 0;
-	int cur = status % dim;
-	int left = (status-1)%dim;
-	int right = (status+1)%dim;
-	if( left > 0 && left < cur && get_BinairoBoard( brd, left ) == digit )
-		count++;
-	if( right > cur && get_BinairoBoard( brd, right ) == digit )
-		count++;
-	return count != 2;
+    char count = 0;
+    int cur = status % dim;
+    int left = (status-1)%dim;
+    int right = (status+1)%dim;
+    if( left > 0 && left < cur && get_BinairoBoard( brd, left ) == digit )
+        count++;
+    if( right > cur && get_BinairoBoard( brd, right ) == digit )
+        count++;
+    return count != 2;
 }
 
 
@@ -131,19 +132,19 @@ static bool chk_mid_adj( int status, Digit digit ){
 /// @pre - status should be a spot at an end of a row or a column 
 static bool chk_unique_rows( int status ){
 
-	if( status%dim != dim-1 )
-		return true;
+    if( status%dim != dim-1 )
+        return true;
 
-	int idx = status/dim;
-	while( idx-- > 0 ){
-	
-	}
-	return true;
-	
+    int idx = status/dim;
+    while( idx-- > 0 ){
+    
+    }
+    return true;
+    
 }
 
 static bool chk_unique_cols( int status ){
-	return false;
+    return false;
 }
 
 
@@ -151,48 +152,48 @@ static bool chk_unique_cols( int status ){
 /// is_valid
 ///
 /// when a digit is put on a cell, it would check the following:
-/// 	if the piece is not at the end of the row:
-/// 		- check adjacent digits (horizontal and vertical)
-///			- number of 0s == number of 1s in row and col
-///		if cell spot is at end of row:
-///			- check for unique row
-///		if cell spot is at end of column:
-///			- check for unique column
+///     if the piece is not at the end of the row:
+///         - check adjacent digits (horizontal and vertical)
+///         - number of 0s == number of 1s in row and col
+///     if cell spot is at end of row:
+///         - check for unique row
+///     if cell spot is at end of column:
+///         - check for unique column
 ///
 /// @param status - the cell spot that is being validated
 ///
 /// @return true if the digit at cell is valid; otherwise, false
 ///
 static bool is_valid( int status ) { 
-	Digit d = get_BinairoBoard( brd, status );
+    Digit d = get_BinairoBoard( brd, status );
 
-	// check number of 0s == number of 1s in row
-	if( numberof_BinairoBoard( brd, status/dim, ZERO ) > dim/2 || 
-			numberof_BinairoBoard( brd, status/dim, ONE ) > dim/2 ){
-		DEBUG_FALSE;
-		return false;
-	}	
+    // check number of 0s == number of 1s in row
+    if( numberof_BinairoBoard( brd, status/dim, ZERO ) > dim/2 || 
+            numberof_BinairoBoard( brd, status/dim, ONE ) > dim/2 ){
+        DEBUG_FALSE;
+        return false;
+    }   
 
 
-	// check adjacency	
-	if( !(	chk_left_adj( status, d ) && 
-		chk_right_adj( status, d ) && 
-		chk_up_adj( status, d ) && 
-		chk_down_adj( status, d ) && 
-		chk_mid_adj( status, d ) )
-	){
-		DEBUG_FALSE;
-		return false;
-	}
+    // check adjacency  
+    if( !(  chk_left_adj( status, d ) && 
+        chk_right_adj( status, d ) && 
+        chk_up_adj( status, d ) && 
+        chk_down_adj( status, d ) && 
+        chk_mid_adj( status, d ) )
+    ){
+        DEBUG_FALSE;
+        return false;
+    }
 
-	// at end of row
-	if( !chk_unique_rows( status ) ){
-		DEBUG_FALSE;
-		return false;
-	}	
+    // at end of row
+    if( !chk_unique_rows( status ) ){
+        DEBUG_FALSE;
+        return false;
+    }   
 
-	DEBUG_TRUE;
-	return true;	
+    DEBUG_TRUE;
+    return true;    
 }
 
 
@@ -207,37 +208,38 @@ static bool is_valid( int status ) {
 /// @return true if backtracker finds a solution; otherwise, false
 ///
 static bool bt_solve( int status ) {
-	// goal reached
-	if( is_goal( dim*dim, status ) )
-		return true;
-	
-	// no solution found
-	if( status < 0 )
-		return false;
-	
-	// check if cell in board is already marked
-	if( is_marked_BinairoBoard( brd, status ) )
-		return bt_solve( status+1 );
-	
-	// lay digits and validate
-	else{
-		for( Digit i=ZERO; i<=ONE; i++ ){
+    // goal reached
+    if( is_goal( dim*dim, status ) )
+        return true;
+    
+    // no solution found
+    if( status < 0 )
+        return false;
+    
+    // check if cell in board is already marked
+    if( is_marked_BinairoBoard( brd, status ) )
+        return bt_solve( status+1 );
+    
+    // lay digits and validate
+    else{
+		Digit i;
+        for( i=ZERO; i<=ONE; i++ ){
 
-			// put digit in spot
-			put_BinairoBoard( brd, status, i );
+            // put digit in spot
+            put_BinairoBoard( brd, status, i );
 
-			DEBUG_BRD;
+            DEBUG_BRD;
 
-			// advance a depth if valid		
-			if( is_valid( status ) && bt_solve( status+1 ) )
-					return true;
+            // advance a depth if valid     
+            if( is_valid( status ) && bt_solve( status+1 ) )
+                    return true;
 
-		}
-		
-		put_BinairoBoard( brd, status, BLANK );	
-		DEBUG_BRD;
-		return false;
-	}
+        }
+       
+        put_BinairoBoard( brd, status, i ); 
+        DEBUG_BRD;
+        return false;
+    }
 }
 
 
@@ -252,16 +254,16 @@ static void apply_heuristics( ){}
 /// the "main" function for this backtracking 
 bool solve( ) {
 
-	if( brd == NULL ){
-		fprintf( stderr, "Error: board has not been initialized for backtracker\n" );
-		return false;
-	}
+    if( brd == NULL ){
+        fprintf( stderr, "Error: board has not been initialized for backtracker\n" );
+        return false;
+    }
 
-	// apply heuristics on board
-	apply_heuristics( );
+    // apply heuristics on board
+    apply_heuristics( );
 
-	// beginning at the starting cell
-	return bt_solve( 0 );
+    // beginning at the starting cell
+    return bt_solve( 0 );
 }
 
 

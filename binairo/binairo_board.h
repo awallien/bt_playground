@@ -18,15 +18,15 @@
 #define _BINAIRO_BOARD_H
 
 
-#include <stdbool.h>	// bool
-#include <stdlib.h>	// FILE
+#include <stdbool.h>    // bool
+#include <stdlib.h> // FILE
 
 
 /// enumeration representing the valid digits on board
-/// ZERO 	- '0'
-/// ONE 	- '1'
-/// BLANK 	- '.'
-typedef enum { ZERO, ONE, BLANK } Digit;
+/// ZERO    - '0'
+/// ONE     - '1'
+/// BLANK   - '.'
+typedef enum Digit_e { ZERO, ONE, BLANK } Digit;
 
 /// data structure type for a Binairo Board
 typedef struct BinairoBoardStruct* BinairoBoard;

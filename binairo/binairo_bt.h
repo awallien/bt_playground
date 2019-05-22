@@ -1,17 +1,17 @@
 ///
 /// file: 
-/// 		binairo_bt.h
+///     binairo_bt.h
 ///
 /// author:
-///		awallien
+///     awallien
 ///
 /// description:
-///		given a binairo board, it attempts to solve
-///		the puzzle from a heuristic and backtracking
-///		approach
+///     given a binairo board, it attempts to solve
+///     the puzzle from a heuristic and backtracking
+///     approach
 ///
 /// date:
-///		5/14/19
+///     5/14/19
 ///
 
 
@@ -42,7 +42,7 @@ void bt_initialize( BinairoBoard board, bool debug );
 /// algorithm
 ///
 /// @notice: if bt_initialize is not called before this function,
-/// 			the function will return false
+///             the function will return false
 ///
 /// @return true if solution is found; otherwise, false
 ///
