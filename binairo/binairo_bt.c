@@ -24,7 +24,7 @@
 #include "display.h"
 
 #define BLANK printf( "       " )
-#define DELAY 500000
+#define DELAY 100000
 #define DEBUG_TRUE if( debug ) { set_cur_pos( 2*dim+2, 1 ); BLANK; puts( "\rVALID" ); usleep( DELAY ); }
 #define DEBUG_FALSE if ( debug ) { set_cur_pos( 2*dim+2, 1 ); BLANK; puts( "\rINVALID" ); usleep( DELAY ); }
 #define DEBUG_BRD if( debug ) { set_cur_pos( 1, 1 ); print_BinairoBoard( brd, stdout ); }
