@@ -99,7 +99,7 @@ Digit get_BinairoBoard( BinairoBoard board, int cell );
 
 
 ///
-/// numberof_BinairoBoard
+/// numberof_row_BinairoBoard
 ///
 /// get the number of a specified digit in a row on the board
 ///
@@ -107,9 +107,23 @@ Digit get_BinairoBoard( BinairoBoard board, int cell );
 /// @param row   - the row number
 /// @param digit - the specified digit
 ///
-/// @return the number of specified digit
+/// @return the number of specified digit in a row
 ///
-int numberof_BinairoBoard( BinairoBoard board, int row, Digit digit );
+int numberof_row_BinairoBoard( BinairoBoard board, int row, Digit digit );
+
+
+///
+/// numberof_col_BinairoBoard
+///
+/// get the number of specified digit in a column on the board
+///
+/// @param board - the binairo board
+/// @param column - the column number
+/// @param digit - the specified digit
+///
+/// @return the number of the digit in a column
+///
+int numberof_column_BinairoBoard( BinairoBoard board, int column, Digit digit );
 
 
 ///

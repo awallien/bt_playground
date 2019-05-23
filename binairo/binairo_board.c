@@ -309,7 +309,7 @@ Digit get_BinairoBoard( BinairoBoard b, int cell ){
 
 
 /// get number of digit in a row
-int numberof_BinairoBoard( BinairoBoard b, int row_number, Digit d  ){
+int numberof_row_BinairoBoard( BinairoBoard b, int row_number, Digit d ){
     assert( b );
     switch( d ){
         case ONE:
@@ -322,4 +322,19 @@ int numberof_BinairoBoard( BinairoBoard b, int row_number, Digit d  ){
 
     }
     return 0;
+}
+
+/// get number of digit in a column
+int numberof_column_BinairoBoard( BinairoBoard b, int col_number, Digit d ){
+	assert( b );
+	switch( d ){
+		case ONE:
+			return b->c_contents[col_number]->num_of_1s;
+		case ZERO:
+			return b->c_contents[col_number]->num_of_0s;
+		case BLANK:
+			return b->dim - b->c_contents[col_number]->num_of_0s - 
+						b->c_contents[col_number]->num_of_1s;
+	}
+	return 0;
 }
