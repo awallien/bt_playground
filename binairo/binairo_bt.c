@@ -24,7 +24,7 @@
 #include "display.h"
 
 #define BLANK printf( "       " )
-#define DELAY 100000
+#define DELAY 500000
 #define DEBUG_TRUE if( debug ) { set_cur_pos( 2*dim+2, 1 ); BLANK; puts( "\rVALID" ); usleep( DELAY ); }
 #define DEBUG_FALSE if ( debug ) { set_cur_pos( 2*dim+2, 1 ); BLANK; puts( "\rINVALID" ); usleep( DELAY ); }
 #define DEBUG_BRD if( debug ) { set_cur_pos( 1, 1 ); print_BinairoBoard( brd, stdout ); }
@@ -63,7 +63,7 @@ static bool is_goal( int area, int status ) { return status == area; }
 
 
 ///
-/// chk_[left,right,up,down,mid]_adj
+/// chk_[left,right,up,down,midrow,midcol]_adj
 ///
 /// list of functions that validates a digit being
 /// put in a cell on the board by checking the adjacent
@@ -77,7 +77,7 @@ static bool is_goal( int area, int status ) { return status == area; }
 static bool chk_left_adj( int status, Digit digit ){
     char idx = 2;
     char count = 0;
-    while( status > 0 && (--status)%dim >= 0 && idx-- )
+    while( status >= 0 && (--status)%dim >= 0 && idx-- )
         count += get_BinairoBoard( brd, status ) == digit ? 1 : 0;
     return count != 2; 
 }
@@ -93,7 +93,7 @@ static bool chk_right_adj( int status, Digit digit ){
 static bool chk_up_adj( int status, Digit digit ){
     char idx = 2;
     char count = 0;
-    while( (status-=dim) > 0 && idx-- )
+    while( (status-=dim) >= 0 && idx-- )
         count += get_BinairoBoard( brd, status ) == digit ? 1 : 0;  
     return count != 2;
 }
@@ -106,14 +106,24 @@ static bool chk_down_adj( int status, Digit digit ){
     return count != 2;  
 }
 
-static bool chk_mid_adj( int status, Digit digit ){
+static bool chk_midrow_adj( int status, Digit digit ){
     char count = 0;
-    int cur = status % dim;
-    int left = (status-1)%dim;
-    int right = (status+1)%dim;
-    if( left > 0 && left < cur && get_BinairoBoard( brd, left ) == digit )
+    int left = status-1;
+    int right = status+1;
+    if( left >= 0 && left%dim < status%dim && get_BinairoBoard( brd, left ) == digit )
         count++;
-    if( right > cur && get_BinairoBoard( brd, right ) == digit )
+    if( right < dim*dim && right%dim > status%dim && get_BinairoBoard( brd, right ) == digit )
+        count++;
+    return count != 2;
+}
+
+static bool chk_midcol_adj( int status, Digit digit ){
+    char count = 0;
+    int top = status-dim;
+    int bottom = status+dim;
+    if( top >= 0 && get_BinairoBoard( brd, top ) == digit )
+        count++;
+    if( bottom < dim*dim && get_BinairoBoard( brd, bottom ) == digit )
         count++;
     return count != 2;
 }
@@ -168,19 +178,25 @@ static bool is_valid( int status ) {
     Digit d = get_BinairoBoard( brd, status );
 
     // check number of 0s == number of 1s in row
-    if( numberof_BinairoBoard( brd, status/dim, ZERO ) > dim/2 || 
-            numberof_BinairoBoard( brd, status/dim, ONE ) > dim/2 ){
+    if( numberof_row_BinairoBoard( brd, status/dim, ZERO ) > dim/2 || 
+            numberof_row_BinairoBoard( brd, status/dim, ONE ) > dim/2 ){
         DEBUG_FALSE;
         return false;
-    }   
+    }
 
+    if( numberof_column_BinairoBoard( brd, status%dim, ZERO ) > dim/2 ||
+            numberof_column_BinairoBoard( brd, status%dim, ONE ) > dim/2 ){
+	DEBUG_FALSE;
+	return false;
+    }
 
     // check adjacency  
     if( !(  chk_left_adj( status, d ) && 
         chk_right_adj( status, d ) && 
         chk_up_adj( status, d ) && 
         chk_down_adj( status, d ) && 
-        chk_mid_adj( status, d ) )
+        chk_midrow_adj( status, d )  &&
+        chk_midcol_adj( status, d ) )
     ){
         DEBUG_FALSE;
         return false;
