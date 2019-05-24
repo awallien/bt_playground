@@ -24,7 +24,7 @@
 #include "display.h"
 
 #define BLANK printf( "       " )
-#define DELAY 500000
+#define DELAY 300000
 #define DEBUG_TRUE if( debug ) { set_cur_pos( 2*dim+2, 1 ); BLANK; puts( "\rVALID" ); usleep( DELAY ); }
 #define DEBUG_FALSE if ( debug ) { set_cur_pos( 2*dim+2, 1 ); BLANK; puts( "\rINVALID" ); usleep( DELAY ); }
 #define DEBUG_BRD if( debug ) { set_cur_pos( 1, 1 ); print_BinairoBoard( brd, stdout ); }
@@ -77,7 +77,8 @@ static bool is_goal( int area, int status ) { return status == area; }
 static bool chk_left_adj( int status, Digit digit ){
     char idx = 2;
     char count = 0;
-    while( status >= 0 && (--status)%dim >= 0 && idx-- )
+    int cur = status%dim;
+    while( status >= 0 && (--status)%dim <= cur && idx-- )
         count += get_BinairoBoard( brd, status ) == digit ? 1 : 0;
     return count != 2; 
 }
@@ -238,7 +239,7 @@ static bool bt_solve( int status ) {
     
     // lay digits and validate
     else{
-		Digit i;
+	Digit i;
         for( i=ZERO; i<=ONE; i++ ){
 
             // put digit in spot
