@@ -39,11 +39,13 @@ static int dim = 0;
 /// graphics debugging
 static bool debug = false;
 
+
 // initialize the backtracker
 void bt_initialize( BinairoBoard b, bool d ){
     brd = b;
     dim = dim_BinairoBoard( brd );
     debug = d;
+
 }
 
 
@@ -78,7 +80,7 @@ static bool chk_left_adj( int status, Digit digit ){
     char idx = 2;
     char count = 0;
     int cur = status%dim;
-    while( status >= 0 && (--status)%dim <= cur && idx-- )
+    while( --status >= 0 && status%dim <= cur && idx-- )
         count += get_BinairoBoard( brd, status ) == digit ? 1 : 0;
     return count != 2; 
 }
@@ -142,7 +144,6 @@ static bool chk_midcol_adj( int status, Digit digit ){
 ///
 /// @pre - status should be a spot at an end of a row or a column 
 static bool chk_unique_rows( int status ){
-
     if( status%dim != dim-1 )
         return true;
 
@@ -151,7 +152,6 @@ static bool chk_unique_rows( int status ){
     
     }
     return true;
-    
 }
 
 static bool chk_unique_cols( int status ){

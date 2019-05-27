@@ -73,7 +73,7 @@ BinairoBoard create_BinairoBoard( FILE* config_file ){
     
     assert( brd );
 
-    brd->dim = size;
+    brd->dim = (int)size;
 
 	brd->c_contents = calloc( size, sizeof( ColInfo* ) );
     brd->r_contents = calloc( size, sizeof( RowInfo* ) );
@@ -84,9 +84,9 @@ BinairoBoard create_BinairoBoard( FILE* config_file ){
 	// make each column info
 	for( size_t i=0; i<size; i++ ){
 		assert( brd->c_contents[i] = malloc( sizeof( ColInfo ) ) );
-		assert( brd->c_contents[i]->col = calloc( size, sizeof( char ) ) );	
+		assert( brd->c_contents[i]->col = calloc( brd->dim, sizeof( char ) ) );	
 		brd->c_contents[i]->num_of_0s = 0;
-		brd->c_contents[i]->num_of_1s = 0;	
+		brd->c_contents[i]->num_of_1s = 0;
 	}
 
     // make each row from config file
@@ -95,7 +95,7 @@ BinairoBoard create_BinairoBoard( FILE* config_file ){
         brd->r_contents[i] = malloc( sizeof( RowInfo ) );
         assert( brd->r_contents[i] );
         
-        brd->r_contents[i]->row = calloc( size, sizeof( char ) );
+        brd->r_contents[i]->row = calloc( brd->dim, sizeof( char ) );
         assert( brd->r_contents[i]->row );
 
         brd->r_contents[i]->num_of_0s = 0;
