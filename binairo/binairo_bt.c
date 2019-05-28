@@ -13,7 +13,9 @@
 ///     5/12/19
 ///
 
+
 #define _DEFAULT_SOURCE
+#include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,6 +24,7 @@
 #include "binairo_board.h"
 #include "binairo_bt.h"
 #include "display.h"
+#include "hash_info.h"
 
 #define BLANK printf( "       " )
 #define DELAY 300000
@@ -39,13 +42,16 @@ static int dim = 0;
 /// graphics debugging
 static bool debug = false;
 
+/// hash info for checking duplicate rows and columns
+static HashInfo hashinfo = NULL;
+
 
 // initialize the backtracker
 void bt_initialize( BinairoBoard b, bool d ){
     brd = b;
     dim = dim_BinairoBoard( brd );
     debug = d;
-
+	hashinfo = create_HashInfo( dim );
 }
 
 
@@ -144,14 +150,39 @@ static bool chk_midcol_adj( int status, Digit digit ){
 ///
 /// @pre - status should be a spot at an end of a row or a column 
 static bool chk_unique_rows( int status ){
-    if( status%dim != dim-1 )
-        return true;
+	// check if at end of row
+	if( status%dim != dim-1 )
+		return true;
 
-    int idx = status/dim;
-    while( idx-- > 0 ){
-    
-    }
-    return true;
+	// build string to put in hash_info
+	char* row_str = calloc( dim, sizeof( char ) + 1 );
+	int idx;
+	for( idx=0; idx<dim; idx++ ){
+		switch( get_BinairoBoard( brd, status-dim+1+idx ) ){
+			case ZERO:
+				row_str[idx] = '0';
+				break;
+			case ONE:
+				row_str[idx] = '1';
+				break;
+			default:
+				assert( get_BinairoBoard( brd, status-dim-1+idx ) );
+		}	
+	}
+	row_str[idx] = '\0';
+
+	// put hash into collection and compare hash to others
+	put_HashInfo( hashinfo, row_str, ROW, status );
+   	size_t cur_hash = get_HashInfo( hashinfo, ROW, status );	
+	while( (status-=dim) > 0 ){
+		if( cur_hash == get_HashInfo( hashinfo, ROW, status ) ){
+			free( row_str );
+			return false;	
+		}
+	}
+
+	free( row_str );
+	return true;
 }
 
 static bool chk_unique_cols( int status ){
@@ -187,8 +218,8 @@ static bool is_valid( int status ) {
 
     if( numberof_column_BinairoBoard( brd, status%dim, ZERO ) > dim/2 ||
             numberof_column_BinairoBoard( brd, status%dim, ONE ) > dim/2 ){
-	DEBUG_FALSE;
-	return false;
+		DEBUG_FALSE;
+		return false;
     }
 
     // check adjacency  
@@ -214,7 +245,6 @@ static bool is_valid( int status ) {
 }
 
 
-/// TODO: for going forward and backward correctly, works for now
 ///
 /// bt_solve
 ///
