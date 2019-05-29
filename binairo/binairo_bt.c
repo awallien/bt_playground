@@ -143,6 +143,53 @@ static bool chk_midcol_adj( int status, Digit digit ){
 }
 
 ///
+/// store_hash
+///
+/// helper function to store a string's hash value into 
+/// the hash collection
+///
+/// @param dir - the vector direction, either row or column
+/// @param status - the current row or column
+static void store_hash( Vector dir, int status ){
+	char* str = calloc( dim+1, sizeof( char ) );
+	int idx;
+	
+	for( idx=0; idx<dim; idx++ ){
+		switch( dir ){
+			case ROW:
+				switch( get_BinairoBoard( brd, status-dim+1+idx ) ){
+					case ZERO:
+						str[idx] = '0';
+						break;
+					case ONE:
+						str[idx] = '1';
+						break;
+					default:
+						assert( get_BinairoBoard( brd, status-dim+1+idx ) );
+				}
+				break;
+			case COL:
+				switch( get_BinairoBoard( brd, status-idx*dim ) ){
+					case ZERO:
+						str[dim-idx-1] = '0'; 
+						break;
+					case ONE:
+						str[dim-idx-1] = '1';
+						break;
+					default:
+						assert( get_BinairoBoard( brd, status-idx*dim ) );
+				}	
+		}
+	}
+	str[idx] = '\0';
+
+	put_HashInfo( hashinfo, str, dir, dir == ROW ? status/dim : status%dim );
+	free( str );
+}  
+
+
+
+///
 /// chk_unique_[rows,cols]
 ///
 /// checks if each row or column is unique to the other rows or columns
@@ -159,40 +206,34 @@ static bool chk_unique_rows( int status ){
 	if( status%dim != dim-1 )
 		return true;
 
-	// build string to put in hash_info
-	char* row_str = calloc( dim+1, sizeof( char ) );
-	int idx;
-	for( idx=0; idx<dim; idx++ ){
-		switch( get_BinairoBoard( brd, status-dim+1+idx ) ){
-			case ZERO:
-				row_str[idx] = '0';
-				break;
-			case ONE:
-				row_str[idx] = '1';
-				break;
-			default:
-				assert( get_BinairoBoard( brd, status-dim+1+idx ) );
-		}	
-	}
-	row_str[idx] = '\0';
-	// put hash into collection and compare hash to others
-	put_HashInfo( hashinfo, row_str, ROW, status/dim );
-	free( row_str );
- 	
+	store_hash( ROW, status );
+
 	size_t cur_hash = get_HashInfo( hashinfo, ROW, status/dim );	
-	while( (status-=dim) > 0 ){
-		if( cur_hash == get_HashInfo( hashinfo, ROW, status/dim ) ){
+
+	while( (status-=dim) > 0 )
+		if( cur_hash == get_HashInfo( hashinfo, ROW, status/dim ) )
 			return false;	
-		}
-	}
+
 	return true;
 }
 
-/*
 static bool chk_unique_cols( int status ){
-    return false;
+    // check if at end of column
+	if( status < dim*dim-dim )
+		return true;
+
+	store_hash( COL, status );
+
+	int idx = status%dim;
+	size_t cur_hash = get_HashInfo( hashinfo, COL, idx );
+
+	while( idx-- > 0 )
+		if( cur_hash == get_HashInfo( hashinfo, COL, idx ) )
+			return false;
+
+	return true;
 }
-*/
+
 
 ///
 /// is_valid
@@ -219,7 +260,7 @@ static bool is_valid( int status ) {
         DEBUG_FALSE;
         return false;
     }
-
+	// in columns
     if( numberof_column_BinairoBoard( brd, status%dim, ZERO ) > dim/2 ||
             numberof_column_BinairoBoard( brd, status%dim, ONE ) > dim/2 ){
 		DEBUG_FALSE;
@@ -243,6 +284,12 @@ static bool is_valid( int status ) {
         DEBUG_FALSE;
         return false;
     }   
+
+	// at end of column
+	if( !chk_unique_cols( status ) ){
+		DEBUG_FALSE;
+		return false;
+	}
 
     DEBUG_TRUE;
     return true;    
@@ -268,8 +315,10 @@ static bool bt_solve( int status ) {
         return false;
     
     // check if cell in board is already marked
-    if( is_marked_BinairoBoard( brd, status ) && chk_unique_rows( status ) )
-        return bt_solve( status+1 );
+    if( is_marked_BinairoBoard( brd, status ) ){
+        if( chk_unique_rows( status ) && chk_unique_cols( status ) )
+			return bt_solve( status+1 );
+	}
     
     // lay digits and validate
     else{
@@ -289,8 +338,8 @@ static bool bt_solve( int status ) {
        
         put_BinairoBoard( brd, status, i ); 
         DEBUG_BRD;
-        return false;
     }
+	return false;
 }
 
 
