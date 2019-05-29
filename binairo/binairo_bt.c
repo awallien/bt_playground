@@ -143,7 +143,6 @@ static bool chk_midcol_adj( int status, Digit digit ){
     return count != 2;
 }
 
-
 ///
 /// chk_unique_[rows,cols]
 ///
@@ -155,6 +154,7 @@ static bool chk_midcol_adj( int status, Digit digit ){
 /// @return - true if all rows and columns are unique; otherwise, false
 ///
 /// @pre - status should be a spot at an end of a row or a column 
+///
 static bool chk_unique_rows( int status ){
 	// check if at end of row
 	if( status%dim != dim-1 )
@@ -172,22 +172,20 @@ static bool chk_unique_rows( int status ){
 				row_str[idx] = '1';
 				break;
 			default:
-				assert( get_BinairoBoard( brd, status-dim-1+idx ) );
+				assert( get_BinairoBoard( brd, status-dim+1+idx ) );
 		}	
 	}
 	row_str[idx] = '\0';
-
 	// put hash into collection and compare hash to others
 	put_HashInfo( hashinfo, row_str, ROW, status/dim );
-   	size_t cur_hash = get_HashInfo( hashinfo, ROW, status/dim );	
+	free( row_str );
+ 	
+	size_t cur_hash = get_HashInfo( hashinfo, ROW, status/dim );	
 	while( (status-=dim) > 0 ){
 		if( cur_hash == get_HashInfo( hashinfo, ROW, status/dim ) ){
-			free( row_str );
 			return false;	
 		}
 	}
-
-	free( row_str );
 	return true;
 }
 
@@ -271,13 +269,13 @@ static bool bt_solve( int status ) {
         return false;
     
     // check if cell in board is already marked
-    if( is_marked_BinairoBoard( brd, status ) )
+    if( is_marked_BinairoBoard( brd, status ) && chk_unique_rows( status ) )
         return bt_solve( status+1 );
     
     // lay digits and validate
     else{
-	Digit i;
-        for( i=ZERO; i<=ONE; i++ ){
+        Digit i;
+    	for( i=ZERO; i<=ONE; i++ ){
 
             // put digit in spot
             put_BinairoBoard( brd, status, i );
@@ -300,16 +298,15 @@ static bool bt_solve( int status ) {
 ///
 /// apply_heuristics
 ///
-/// will be implemented later
+/// will be implemented later if I ever get back to this solver
 ///
 static void apply_heuristics( ){}
 
 
 /// the "main" function for this backtracking 
 bool solve( ) {
-
     if( brd == NULL ){
-        fprintf( stderr, "Error: board has not been initialized for backtracker\n" );
+        fprintf( stderr, "Error: board has not been initialized for backtracker.\n" );
         return false;
     }
 

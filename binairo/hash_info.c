@@ -17,7 +17,7 @@
 
 #include <assert.h>
 #include <stdlib.h>
-
+#include <stdio.h>
 
 /// data representation of the hash collection
 /// that contains information of all row and column hashes
@@ -31,7 +31,6 @@ struct HashInfoStruct {
 
 /// create the hash info struct
 HashInfo create_HashInfo( int dim ){
-
 	HashInfo hi = malloc( sizeof( struct HashInfoStruct ) );
 
 	assert( hi != NULL );
@@ -41,8 +40,9 @@ HashInfo create_HashInfo( int dim ){
 
 	assert( hi->hash_r && hi->hash_c );
 
-	return hi;	
+	hi->dim = dim;
 
+	return hi;	
 }
 
 
@@ -82,4 +82,11 @@ size_t get_HashInfo( HashInfo hi, Vector dir, int vec ){
 	}	
 	assert( !dir );
 	return 0;	
+}
+
+void print_debug_HashInfo( HashInfo h ){
+	int i;
+	for( i=0; i<h->dim; i++ ){
+		printf( "row[%d]: %lu\n", i, h->hash_r[i] ); fflush(stdout);
+	}
 }	

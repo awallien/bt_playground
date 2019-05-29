@@ -76,5 +76,6 @@ void put_HashInfo( HashInfo hashinfo, char* string, Vector direction, int index 
 ///
 size_t get_HashInfo( HashInfo hashinfo, Vector direction, int index );
 
+void print_debug_HashInfo( HashInfo hahs );
 
 #endif //_HASH_INFO_H
