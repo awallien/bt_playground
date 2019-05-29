@@ -249,7 +249,7 @@ bool is_marked_BinairoBoard( BinairoBoard b, int cell ){
 
 
 #define COL( b, cell ) 		b->c_contents[cell%b->dim]
-#define ROW( b, cell )      b->r_contents[cell/b->dim]  
+#define ROW( b, cell )        b->r_contents[cell/b->dim]  
 #define SPOT( b, cell )     b->r_contents[cell/b->dim]->row[cell%b->dim]
 #define CPOT( b, cell )		b->c_contents[cell%b->dim]->col[cell/b->dim]
 

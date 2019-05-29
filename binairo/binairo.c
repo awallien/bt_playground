@@ -30,7 +30,7 @@
 /// executing program occurs
 ///
 static void print_usage(){
-    fprintf( stderr, "usage: binairo [-f filename] [-d]\n" ); 
+    fprintf( stderr, "usage: binairo [-f filename] [-d enable graphic debugging] [-t delay]\n" ); 
 }
 
 
@@ -45,9 +45,10 @@ static void print_usage(){
 int main( int argc, char* argv[] ){
     FILE* config_file = stdin;
     bool debug = false;
+	double dummy = 0, delay = 1000000;
     char flag;
 
-    while( ( flag = getopt( argc, argv, "df:" ) ) != -1 ){
+    while( ( flag = getopt( argc, argv, "df:t:" ) ) != -1 ){
         switch( flag ) {
             case 'f':
                 config_file = fopen( optarg, "r" );
@@ -59,6 +60,10 @@ int main( int argc, char* argv[] ){
             case 'd':
                 debug = true;
                 break;
+			case 't':
+				dummy = strtod( optarg, NULL );
+				delay = dummy > 0 ? dummy : delay;
+				break;
             case '?':
                 print_usage();
                 return EXIT_FAILURE;
@@ -69,7 +74,7 @@ int main( int argc, char* argv[] ){
     // initial board 
     BinairoBoard brd = create_BinairoBoard( config_file );
 
-    bt_initialize( brd, debug );
+    bt_initialize( brd, debug, delay );
 
     if( brd == NULL ){
         fprintf( stderr, "Error: Unable to create Binairo Board\n");
@@ -97,7 +102,7 @@ int main( int argc, char* argv[] ){
         print_BinairoBoard( brd, stdout );
 
         // finding a solution
-        bt_initialize( brd, debug );
+        bt_initialize( brd, debug, delay );
         if( !solve( ) ){
             printf( "\nNo Solution!\n\n" );
         }

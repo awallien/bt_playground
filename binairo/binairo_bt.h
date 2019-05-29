@@ -30,8 +30,9 @@
 ///
 /// @param board - the starting binairo board
 /// @param debug - is debug enabled?
+/// @param delay - time delay for printing solutions to output
 /// 
-void bt_initialize( BinairoBoard board, bool debug );
+void bt_initialize( BinairoBoard board, bool debug, double delay );
 
 
 ///

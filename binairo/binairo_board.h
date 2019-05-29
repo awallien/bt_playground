@@ -26,7 +26,8 @@
 /// ZERO    - '0'
 /// ONE     - '1'
 /// BLANK   - '.'
-typedef enum Digit_e { ZERO, ONE, BLANK } Digit;
+enum Digit_e { ZERO, ONE, BLANK };
+typedef enum Digit_e Digit;
 
 /// data structure type for a Binairo Board
 typedef struct BinairoBoardStruct* BinairoBoard;

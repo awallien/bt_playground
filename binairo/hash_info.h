@@ -14,16 +14,13 @@
 /// 		
 
 
+#ifndef _HASH_INFO_H
+#define _HASH_INFO_H
+
 #include <stdlib.h>
 
-
-#ifndef __HASH_INFO_H
-#define __HASH_INFO_H
-
-
 /// Direction to insert a hash into the hash collection
-typedef enum Vector_e { ROW, COL } Vector; 
-
+typedef enum Vector_e { ROW, COL } Vector;
 
 /// data structure declaration for the hash collection
 typedef struct HashInfoStruct* HashInfo;
@@ -61,9 +58,9 @@ void destroy_HashInfo( HashInfo hashinfo );
 /// @param hashinfo - the hash collection data structure
 /// @param string - the string to compute hash and store in hash collection
 /// @param direction - a vector direction, either row or column
-/// @param status - used for determining if we are on a cell that is at end
-/// 				of row or column
-void put_HashInfo( HashInfo hashinfo, char* string, Vector direction, int status); 
+/// @param index - the row or column to get the hash value from
+///
+void put_HashInfo( HashInfo hashinfo, char* string, Vector direction, int index ); 
 
 
 ///
@@ -73,11 +70,11 @@ void put_HashInfo( HashInfo hashinfo, char* string, Vector direction, int status
 /// 
 /// @param hashinfo - the hash collection data structure
 /// @param direction - the vector direction to get hash value
-/// @param status - the current cell number to get hash value of a row or column
+/// @param index - the row or column to get the hash value from
 ///
 /// @return - the hash value
 ///
-size_t get_HashInfo( HashInfo hashinfo, Vector direction, int status );
+size_t get_HashInfo( HashInfo hashinfo, Vector direction, int index );
 
 
-#endif //__HASH_INFO_H
+#endif //_HASH_INFO_H

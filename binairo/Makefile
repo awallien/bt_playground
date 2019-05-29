@@ -1,5 +1,5 @@
 #
-# Created by gmakemake (Ubuntu Jul 25 2014) on Thu May 16 03:29:54 2019
+# Created by gmakemake (Ubuntu Jul 25 2014) on Tue May 28 16:49:25 2019
 #
 
 #
@@ -52,13 +52,13 @@ CCLIBFLAGS =
 
 
 CPP_FILES =	
-C_FILES =	binairo.c binairo_board.c binairo_bt.c get_line.c display.c hash_info.c
+C_FILES =	binairo.c binairo_board.c binairo_bt.c display.c get_line.c hash_info.c
 PS_FILES =	
 S_FILES =	
-H_FILES =	binairo_board.h binairo_bt.h get_line.h display.h hash_info.h
+H_FILES =	binairo_board.h binairo_bt.h display.h get_line.h hash_info.h
 SOURCEFILES =	$(H_FILES) $(CPP_FILES) $(C_FILES) $(S_FILES)
 .PRECIOUS:	$(SOURCEFILES)
-OBJFILES =	binairo_board.o binairo_bt.o get_line.o display.o hash_info.o
+OBJFILES =	binairo_board.o binairo_bt.o display.o get_line.o hash_info.o 
 
 #
 # Main targets
@@ -73,12 +73,12 @@ binairo:	binairo.o $(OBJFILES)
 # Dependencies
 #
 
-display.o:	display.h
 binairo.o:	binairo_board.h binairo_bt.h display.h
 binairo_board.o:	binairo_board.h get_line.h
-binairo_bt.o:	binairo_board.h binairo_bt.h hash_info.h
+binairo_bt.o:	binairo_board.h binairo_bt.h display.h hash_info.h
+display.o:	display.h
 get_line.o:	get_line.h
-hash_info.o: 	hash_info.h
+hash_info.o:	hash_info.h
 
 #
 # Housekeeping

@@ -25,7 +25,7 @@ struct HashInfoStruct {
 	size_t* hash_r;
 	size_t* hash_c;
 	int dim;
-}
+};
 
 #include "hash_info.h"
 
@@ -63,10 +63,10 @@ void put_HashInfo( HashInfo hi, char* s, Vector dir, int vec ){
 	size_t num = strtol( s, NULL, 2 );
 	switch( dir ){
 		case ROW:
-			hi->hash_r[vec/hi->dim] = num;
+			hi->hash_r[vec] = num;
 			break;
 		case COL:
-			hi->hash_c[vec%hi->dim] = num;
+			hi->hash_c[vec] = num;
 			break;
 	}
 }
@@ -76,9 +76,10 @@ void put_HashInfo( HashInfo hi, char* s, Vector dir, int vec ){
 size_t get_HashInfo( HashInfo hi, Vector dir, int vec ){
 	switch( dir ){
 		case ROW:
-			return hi->hash_r[vec/hi->dim];
+			return hi->hash_r[vec];
 		case COL:
-			return hi->hash_c[vec%hi->dim];
+			return hi->hash_c[vec];
 	}	
-	assert( !dir );	
+	assert( !dir );
+	return 0;	
 }	

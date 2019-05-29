@@ -27,9 +27,8 @@
 #include "hash_info.h"
 
 #define BLANK printf( "       " )
-#define DELAY 300000
-#define DEBUG_TRUE if( debug ) { set_cur_pos( 2*dim+2, 1 ); BLANK; puts( "\rVALID" ); usleep( DELAY ); }
-#define DEBUG_FALSE if ( debug ) { set_cur_pos( 2*dim+2, 1 ); BLANK; puts( "\rINVALID" ); usleep( DELAY ); }
+#define DEBUG_TRUE if( debug ) { set_cur_pos( 2*dim+2, 1 ); BLANK; puts( "\rVALID" ); usleep( delay ); }
+#define DEBUG_FALSE if ( debug ) { set_cur_pos( 2*dim+2, 1 ); BLANK; puts( "\rINVALID" ); usleep( delay ); }
 #define DEBUG_BRD if( debug ) { set_cur_pos( 1, 1 ); print_BinairoBoard( brd, stdout ); }
 
 
@@ -45,12 +44,16 @@ static bool debug = false;
 /// hash info for checking duplicate rows and columns
 static HashInfo hashinfo = NULL;
 
+/// delay for printing board in debug mode
+static double delay = 1000000;
+
 
 // initialize the backtracker
-void bt_initialize( BinairoBoard b, bool d ){
+void bt_initialize( BinairoBoard b, bool d, double del ){
     brd = b;
     dim = dim_BinairoBoard( brd );
     debug = d;
+	delay = del*1000000;
 	hashinfo = create_HashInfo( dim );
 }
 
@@ -67,7 +70,10 @@ void bt_initialize( BinairoBoard b, bool d ){
 ///
 /// @return - current cell on board is last cell on board
 ///
-static bool is_goal( int area, int status ) { return status == area; }
+/// static bool is_goal( int area, int status ) { return status == area; }
+
+/// simpler line to check for goal
+#define IS_GOAL dim*dim == status
 
 
 ///
@@ -155,7 +161,7 @@ static bool chk_unique_rows( int status ){
 		return true;
 
 	// build string to put in hash_info
-	char* row_str = calloc( dim, sizeof( char ) + 1 );
+	char* row_str = calloc( dim+1, sizeof( char ) );
 	int idx;
 	for( idx=0; idx<dim; idx++ ){
 		switch( get_BinairoBoard( brd, status-dim+1+idx ) ){
@@ -172,10 +178,10 @@ static bool chk_unique_rows( int status ){
 	row_str[idx] = '\0';
 
 	// put hash into collection and compare hash to others
-	put_HashInfo( hashinfo, row_str, ROW, status );
-   	size_t cur_hash = get_HashInfo( hashinfo, ROW, status );	
+	put_HashInfo( hashinfo, row_str, ROW, status/dim );
+   	size_t cur_hash = get_HashInfo( hashinfo, ROW, status/dim );	
 	while( (status-=dim) > 0 ){
-		if( cur_hash == get_HashInfo( hashinfo, ROW, status ) ){
+		if( cur_hash == get_HashInfo( hashinfo, ROW, status/dim ) ){
 			free( row_str );
 			return false;	
 		}
@@ -185,10 +191,11 @@ static bool chk_unique_rows( int status ){
 	return true;
 }
 
+/*
 static bool chk_unique_cols( int status ){
     return false;
 }
-
+*/
 
 ///
 /// is_valid
@@ -256,7 +263,7 @@ static bool is_valid( int status ) {
 ///
 static bool bt_solve( int status ) {
     // goal reached
-    if( is_goal( dim*dim, status ) )
+    if( IS_GOAL )
         return true;
     
     // no solution found
@@ -310,7 +317,12 @@ bool solve( ) {
     apply_heuristics( );
 
     // beginning at the starting cell
-    return bt_solve( 0 );
+    bool res = bt_solve( 0 );
+
+	// done with the hash collection
+	destroy_HashInfo( hashinfo );
+
+	return res;
 }
 
 
