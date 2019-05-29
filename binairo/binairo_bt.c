@@ -54,7 +54,6 @@ void bt_initialize( BinairoBoard b, bool d, double del ){
     dim = dim_BinairoBoard( brd );
     debug = d;
 	delay = del*1000000;
-	hashinfo = create_HashInfo( dim );
 }
 
 
@@ -309,6 +308,8 @@ bool solve( ) {
         fprintf( stderr, "Error: board has not been initialized for backtracker.\n" );
         return false;
     }
+
+	hashinfo = create_HashInfo( dim );
 
     // apply heuristics on board
     apply_heuristics( );
