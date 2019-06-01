@@ -84,54 +84,50 @@ The last procedure in the validation methods check if there are unique vectors o
 After a whole row or column is filled, the backtracker would compare the current direction vector with the previous direction vectors to check for any duplicates. To do the comparison, since each vector is filled with 0s and 1s, the hash would be that vector's binary value. The code below illustrates the hashing and comparison process to check for duplicate vectors.
 ```C
 static void store_hash( Vector dir, int status ){
-	char* str = calloc( dim+1, sizeof( char ) );
-	int idx;
-	
-	for( idx=0; idx<dim; idx++ ){
-		switch( dir ){
-			case ROW:
-				switch( get_BinairoBoard( brd, status-dim+1+idx ) ){
-					case ZERO:
-						str[idx] = '0';
-						break;
-					case ONE:
-						str[idx] = '1';
-						break;
-					default:
-						assert( get_BinairoBoard( brd, status-dim+1+idx ) );
-				}
-				break;
-			case COL:
-				switch( get_BinairoBoard( brd, status-idx*dim ) ){
-					case ZERO:
-						str[dim-idx-1] = '0'; 
-						break;
-					case ONE:
-						str[dim-idx-1] = '1';
-						break;
-					default:
-						assert( get_BinairoBoard( brd, status-idx*dim ) );
-				}	
-		}
-	}
-	str[idx] = '\0';
+    char* str = calloc( dim+1, sizeof( char ) );
+    int idx;
 
-	put_HashInfo( hashinfo, str, dir, dir == ROW ? status/dim : status%dim );
-	free( str );
+    for( idx=0; idx<dim; idx++ ){
+        switch( dir ){
+            case ROW:
+                switch( get_BinairoBoard( brd, status-dim+1+idx ) ){
+                    case ZERO:
+                        str[idx] = '0';
+                        break;
+                    case ONE:
+                        str[idx] = '1';
+                        break;
+                    default:
+                        assert( get_BinairoBoard( brd, status-dim+1+idx ) );
+                }
+                break;
+            case COL:
+                switch( get_BinairoBoard( brd, status-idx*dim ) ){
+                    case ZERO:
+                        str[dim-idx-1] = '0'; 
+                        break;
+                    case ONE:
+                        str[dim-idx-1] = '1';
+                        break;
+                    default:
+                        assert( get_BinairoBoard( brd, status-idx*dim ) );
+                }	
+        }
+    }
+    str[idx] = '\0';
+
+    put_HashInfo( hashinfo, str, dir, dir == ROW ? status/dim : status%dim );
+    free( str );
 } 
 static bool chk_unique_rows( int status ){
-	if( status%dim != dim-1 )
-		return true;
-
-	store_hash( ROW, status );
-
-	size_t cur_hash = get_HashInfo( hashinfo, ROW, status/dim );	
-
-	while( (status-=dim) > 0 )
-		if( cur_hash == get_HashInfo( hashinfo, ROW, status/dim ) )
-			return false;	
-
-	return true;
+    if( status%dim != dim-1 )
+        return true;
+    store_hash( ROW, status );
+    size_t cur_hash = get_HashInfo( hashinfo, ROW, status/dim );	
+    while( (status-=dim) > 0 )
+        if( cur_hash == get_HashInfo( hashinfo, ROW, status/dim ) )
+            return false;	
+    return true;
 }
 ```
 As a side note, HashInfo is a data structure that holds a list of hashes for each row and column.
