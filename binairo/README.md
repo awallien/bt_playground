@@ -152,3 +152,6 @@ Overall, the total time complexity for validating a symbol in a cell, <em>H</em>
 ## Installation and Usage
 <em>gcc</em> or equivalent must be installed on machine to compile C source files. Then, execute 
 <em>make</em> to run the Makefile and compile the source and header files into an executable file. 
+
+To input the binairo board, you would need to specify the dimension followed by the initial board. You can enter these
+information through standard input or as a file with the '-f' flag. See ``` data/valid/ ``` for example configuration files.
