@@ -154,4 +154,5 @@ Overall, the total time complexity for validating a symbol in a cell, <em>H</em>
 < To be written >
 
 ## Installation and Usage
-
+<em>gcc</em> or equivalent must be installed on machine to compile C source files. Then, execute 
+<em>make</em> to run the Makefile and compile the source and header files into an executable file. 
