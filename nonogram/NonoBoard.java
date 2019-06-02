@@ -15,6 +15,9 @@ import java.util.Scanner;
  */
 public class NonoBoard {
 
+	private final char MARK = '@';
+	private final char BLANK = ' ';
+
     private boolean[][] board;
 
     private ArrayList<Integer>[] rowHints;
@@ -98,61 +101,58 @@ public class NonoBoard {
 
     }
 
+
+    /**
+     * helper function to make the border lines of the board
+     * @return a line of + and -
+     */
+	private String border( ){
+		StringBuilder res = new StringBuilder("+");
+		for( int i=0; i<board[0].length; i++ )
+			res.append("-+");
+		return res.toString();
+	}
+
     /**
      * String representation of Nonogram puzzle board
      * @return string format of board
      */
     @Override
     public String toString(){
+        StringBuilder s = new StringBuilder(border() + "\n");
 
-        // max number and longest digit of row, column hints
-        int[] rowMaxLong = getMaxLongHints(rowHints);
-        int[] colMaxLong = getMaxLongHints(colHints);
-
-        //TODO find a way to add spacing to the digit length of number rather than having a hardcoded one for each time
-        // aka do something in the double for loop below
-        StringBuilder colSpacing = new StringBuilder(" ");
-        for(int i=0; i<colMaxLong[1]; i++)
-            colSpacing.append(" ");
-
-        // board representation result
-        StringBuilder result = new StringBuilder();
-
-        // helper strings
-        StringBuilder rowHintsSB = new StringBuilder();
-        StringBuilder colHintsSB = new StringBuilder();
-        StringBuilder boardSB = new StringBuilder();
-
-        for(int r=colMaxLong[0]-1; r>=0; r--){
-            for(int c=0; c<NUMBER_OF_COLS; c++){
-                int temp = colHints[c].size()-1-r;
-                if(0 <= temp)
-                    colHintsSB.append(colHints[c].get(temp)).append(colSpacing);
-                else
-                    colHintsSB.append(" ").append(colSpacing);
+        // print the cells
+        for( int i=0; i<board.length; i++ ){
+            s.append( "|" );
+            for( int j=0; j<board[0].length; j++ ){
+                s.append( ( board[i][j] ? MARK : BLANK ) + "|" );
             }
-            colHintsSB.append("\n");
+            s.append( "\n" + border() + "\n" );
         }
 
-        System.out.println(colHintsSB);
-        return rowMaxLong[0] + " " + rowMaxLong[1] + " " + colMaxLong[0] + " " + colMaxLong[1];
-    }
+        s.append( "\n" );
 
-
-    /**
-     * Helper method for toString to get the maximum number and longest digit number
-     * @param arr either rowHints or colHints
-     * @return two numbers - [0] the maximum number of hints and [1] longest digit number hint
-     */
-    private int[] getMaxLongHints(ArrayList<Integer>[] arr){
-        int mnh = 0, ldh = 0;
-        for (ArrayList<Integer> integers : arr) {
-            int tempSize = integers.size();
-            mnh = tempSize > mnh ? tempSize : mnh;
-            for (int n : integers)
-                ldh = n > ldh ? n : ldh;
+        // print the row hints
+        s.append( "Row\n---\n");
+        for( int r=0; r<rowHints.length; r++ ){
+            s.append( r+": ");
+            for( int rh=0; rh<rowHints[r].size(); rh++ ){
+                s.append( rowHints[r].get(rh) + " " );
+            }
+            s.append( "\n" );
         }
-        return new int[]{mnh, String.valueOf(ldh).length()};
+
+        // print the column hints
+        s.append( "\nColumn\n------\n" );
+        for( int c=0; c<colHints.length; c++ ){
+            s.append( c+": " );
+            for( int ch=0; ch<colHints[c].size(); ch++ ){
+                s.append( colHints[c].get(ch) + " " );
+            }
+            s.append( "\n" );
+        }
+
+        return s.toString();
     }
 
 
