@@ -76,7 +76,7 @@ static bool chk_down_adj( int status, Digit digit ){
     return count != 2;  
 }
 ```
-In total, this procedure examines at most 12 cells on every validation check, and the time complexity for getting a symbol in a cell on board is constant time. Therefore, the whole time complexity for this procedure is technically 12*<em>O</em>(2<sup>k</sup>), or simply <em>O</em>(2<sup>k</sup>).
+In total, this procedure examines at most 12 cells on every validation check, and the time complexity for getting a symbol in a cell on board is constant time. Therefore, the whole time complexity for this procedure is technically 12*<em>O</em>(1), or simply <em>O</em>(1).
 
 ### Unique Rows and Columns
 
