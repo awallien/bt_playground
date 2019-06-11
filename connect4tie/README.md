@@ -14,5 +14,18 @@ declared winners.
 
 # Implementation
 
-This program searches and counts for all possible solutions. 
+This program counts for all possible solutions. After a board is completely filled, the number of Xs
+equals the number of Os, and there are no declared winners, the program would increment the counter and
+backtrack to find the next possible solutions.
+
+When a board is validated on a certain cell, it will check adjacency cells that are already filled previously
+for any lines of four similar pieces. The program will validate a piece on a cell if there are no winning lines;
+else, it invalidates and either puts the next piece to check or backtracks. 
+
+When validating a piece on a cell, 
+
+# Computational Complexity
+
+
+
 
