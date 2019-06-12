@@ -42,6 +42,6 @@ north-east directions if on a **C** cell; north, north-west, north-east, and wes
 cell; and north, north-west, and west directions if on an **E** cell.
 
 When the backtracker is beyond the last cell of the grid, it would check if
-the number of Os and Xs are the same. If so, a valid and no-win board is made.
+the number of Os and Xs are the same. If so, a tied board is made.
 
 

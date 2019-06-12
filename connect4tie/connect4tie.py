@@ -24,9 +24,9 @@ representation of the board
 board = [' ' for i in range(42)]
 
 """
-for counting the number of connect four tie board
+for counting the number of connect four tie board, Xs, and Os
 """
-count = 0
+count = {"X": 0, "O": 0, "total": 0}
 
 """
 check if all the values in list are the same value
@@ -41,7 +41,7 @@ checkall = lambda i, j, k: _same(i) or _same(j) or _same(k)
 """
 When done populating the whole board, check if whole board is valid
 """
-is_goal = lambda i: i == 42 and board.count("X") == board.count("O")
+is_goal = lambda i: i == 42 and count["X"] == count["O"]
 
 
 def bt(i=0):
@@ -57,9 +57,11 @@ def bt(i=0):
     elif i < 42:
         for c in ["X", "O"]:
             board[i] = c
+            count[c] += 1
             if is_valid(i) and bt(i + 1):
-                count += 1
-                #print(to_string())
+                count["total"] += 1
+                print(to_string())
+            count[c] -= 1
         board[i] = ' '
 
         if i == 0:
@@ -75,15 +77,19 @@ BL - bottom left area
 BR - bottom right area
 MC - middle column
 """
+
+
 def check_UR(i):
     check_lst1 = board[i - 3:i + 1]
     return _same(check_lst1)
+
 
 def check_BL(i):
     check_lst2 = [board[i], board[i - 7], board[i - 14], board[i - 21]]
     check_lst3 = [board[i], board[i - 6], board[i - 12], board[i - 18]]
 
     return _same(check_lst2) or _same(check_lst3)
+
 
 def check_BR(i):
     check_lst1 = board[i - 3:i + 1]
@@ -92,10 +98,11 @@ def check_BR(i):
 
     return checkall(check_lst1, check_lst2, check_lst3)
 
+
 def check_MC(i):
-    if i in [3,10,17]:
-        return _same(board[i-3:i+1])
-    if i in [24,31,38]:
+    if i in [3, 10, 17]:
+        return _same(board[i - 3:i + 1])
+    if i in [24, 31, 38]:
         return check_BR(i) or _same([board[i], board[i - 6], board[i - 12], board[i - 18]])
 
 
@@ -130,12 +137,11 @@ def to_string():
     res = ""
     for i in range(6):
         for j in range(7):
-            res += board[i*7+j]
+            res += board[i * 7 + j]
         res += "\n"
     return res[::-1]
 
 
 if __name__ == '__main__':
     bt()
-    print(count)
-
+    print(count["total"])
