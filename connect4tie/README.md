@@ -39,9 +39,13 @@ Each letter on the grid symbolizes a piece on the board. For example, if the bac
 on an **A** cell, then it would automatically validate the board since a line of four pieces cannot 
 be made in any directions. The backtracker only checks the west direction if on a **B** cell; north and
 north-east directions if on a **C** cell; north, north-west, north-east, and west directions if on a **D**
-cell; and north, north-west, and west directions if on an **E** cell.
+cell; and north, north-west, and west directions if on an **E** cell. This procedure is done in constant
+time for a cell.
 
 When the backtracker is beyond the last cell of the grid, it would check if
-the number of Os and Xs are the same. If so, a tied board is made.
+the number of Os equals the number of Xs. The time complexity for goal checking
+is done in constant time.
+
+
 
 
