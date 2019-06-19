@@ -1,4 +1,4 @@
-import java.io.FileNotFoundException;
+import java.util.Optional;
 
 /**
  * Main class for Nonogram solver
@@ -18,7 +18,7 @@ public class Nonogram {
 
         // invalid number of arguments
         if(args.length < 1 || args.length > 3){
-            System.err.println("Usage: java Nonogram config-file [debug = true]");
+            System.err.println("Usage: java Nonogram config-file [debug = true|false]");
             System.exit(1);
         }
 
@@ -31,11 +31,11 @@ public class Nonogram {
         // initialize the objects
         NonoBoard board = new NonoBoard(args[0]);
         Backtracker bt = new Backtracker(debug);
+        Optional<Configuration> sol = bt.solve(new NonogramConfig(board));
 
-
-
+        // print the solution
+        System.out.println(sol.isPresent() ? sol.get() : "No Solution!");
 
     }
-
 
 }

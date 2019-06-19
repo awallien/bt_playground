@@ -57,6 +57,34 @@ public class NonoBoard {
         this.NUMBER_OF_COLS = colNum;
     }
 
+    /**
+     * Constructor for the purpose of deep copying Nonoboard objects
+     * @param other - the Nonoboard to copy
+     */
+    public NonoBoard(NonoBoard other) {
+
+        this.NUMBER_OF_COLS = other.NUMBER_OF_COLS;
+        this.NUMBER_OF_ROWS = other.NUMBER_OF_ROWS;
+
+        this.rowHints = other.rowHints;
+        this.colHints = other.colHints;
+
+        this.board = copyBoard(other.board);
+
+    }
+
+    /**
+     * Helper function to copy a board object to a new object
+     * @param board - the board to copy
+     * @return - new board object
+     */
+    private boolean[][] copyBoard(boolean[][] board){
+        boolean[][] newBoard = new boolean[this.NUMBER_OF_ROWS][this.NUMBER_OF_COLS];
+        for(int r=0; r<NUMBER_OF_ROWS; r++){
+            if (NUMBER_OF_COLS >= 0) System.arraycopy(board[r], 0, newBoard[r], 0, NUMBER_OF_COLS);
+        }
+        return newBoard;
+    }
 
     /**
      * Helper method to initialize a collection of hints seen
@@ -77,18 +105,37 @@ public class NonoBoard {
     }
 
     /**
+     * Get list of hints for a specified row
+     * @param row the row number
+     * @return the list of hints
+     */
+    public ArrayList<Integer> getRowHints(int row) {
+        return rowHints[row];
+    }
+
+    /**
+     * Get list of hints for a specified column
+     * @param column the column number
+     * @return the list of hints
+     */
+    public ArrayList<Integer> getColHints(int column) {
+        return colHints[column];
+    }
+
+    /**
      * Mark a row of cells on the board
      * @param row the row to mark the cell(s)
      * @param col the column to mark the cell(s)
      * @param len the number of cells in the group
+     * @param markdown true if marking; otherwise, false if erasing
      * @return true if successful mark; otherwise, false
      */
-    public boolean mark(int row, int col, int len){
-        if(row+len-NUMBER_OF_COLS > 0 || row < 0 || col < 0 || len < 0)
+    public boolean mark(int row, int col, int len, boolean markdown){
+        if(col+len-NUMBER_OF_COLS > 0 || row < 0 || col < 0 || len < 0)
             return false;
 
         for(int i=col; i<col+len; i++)
-            board[row][i] = true;
+            board[row][i] = markdown;
 
         return true;
     }
@@ -119,9 +166,9 @@ public class NonoBoard {
         for( int i=0; i<board.length; i++ ){
             s.append( "|" );
             for( int j=0; j<board[0].length; j++ ){
-                s.append( ( board[i][j] ? MARK : BLANK ) + "|" );
+                s.append( board[i][j] ? MARK : BLANK ).append("|");
             }
-            s.append( "\n" + border() + "\n" );
+            s.append("\n").append(border()).append("\n");
         }
 
         s.append( "\n" );
@@ -129,9 +176,9 @@ public class NonoBoard {
         // print the row hints
         s.append( "Row\n---\n");
         for( int r=0; r<rowHints.length; r++ ){
-            s.append( r+": ");
+            s.append( r ).append( ": " );
             for( int rh=0; rh<rowHints[r].size(); rh++ ){
-                s.append( rowHints[r].get(rh) + " " );
+                s.append( rowHints[r].get(rh) ).append( " " );
             }
             s.append( "\n" );
         }
@@ -139,9 +186,9 @@ public class NonoBoard {
         // print the column hints
         s.append( "\nColumn\n------\n" );
         for( int c=0; c<colHints.length; c++ ){
-            s.append( c+": " );
+            s.append( c ).append( ": " );
             for( int ch=0; ch<colHints[c].size(); ch++ ){
-                s.append( colHints[c].get(ch) + " " );
+                s.append( colHints[c].get(ch) ).append( " " );
             }
             s.append( "\n" );
         }
@@ -164,14 +211,14 @@ public class NonoBoard {
 
         // mark diagonals, all true except one false
         for(int r=0; r<=board.NUMBER_OF_ROWS; r++){
-            System.out.println(board.mark(r,r,1));
+            System.out.println(board.mark(r,r,1,true));
         }
 
         // mark a row
-        System.out.println(board.mark(0,0,board.NUMBER_OF_COLS));
+        System.out.println(board.mark(0,0,board.NUMBER_OF_COLS,true));
 
         // no marking for this
-        System.out.println(board.mark(1,-5,4));
+        System.out.println(board.mark(1,-5,4,true));
 
         System.out.println(board);
 
