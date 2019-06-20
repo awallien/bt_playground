@@ -1,6 +1,7 @@
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.ListIterator;
+import java.util.Random;
 
 /**
  * Class that handles producing multiple successors
@@ -22,7 +23,7 @@ public class NonogramConfig implements Configuration {
      */
     public NonogramConfig(NonoBoard board){
         this.board = board;
-        this.status = 0;
+        this.status = -1;
     }
 
     /**
@@ -41,8 +42,8 @@ public class NonogramConfig implements Configuration {
     @Override
     public Collection<Configuration> getSuccessors() {
         LinkedList<Configuration> successors = new LinkedList<>();
-        buildRow(successors,board.getRowHints(status).iterator(),0,new NonogramConfig(this));
-        ++status;
+        ++this.status;
+        buildRow(successors,board.getRowHints(this.status).listIterator(),0,new NonogramConfig(this));
         return successors;
     }
 
@@ -54,15 +55,16 @@ public class NonogramConfig implements Configuration {
      * @param config - the configuration of this successor
      * @param atColumn - next available spot when marking a row on the board
      */
-    private void buildRow(LinkedList<Configuration> successors, Iterator<Integer> hints,
+    private void buildRow(LinkedList<Configuration> successors, ListIterator<Integer> hints,
                           int atColumn, NonogramConfig config){
         if(hints.hasNext()){
             int hint = hints.next();
-            while(config.board.mark(status,atColumn,hint,true)){
-                buildRow(successors,hints,hint+1,new NonogramConfig(config));
-                config.board.mark(status,atColumn,hint,false);
+            while(config.board.mark(config.status,atColumn,hint,true)){
+                buildRow(successors,hints,hint+atColumn+1,new NonogramConfig(config));
+                config.board.mark(config.status,atColumn,hint,false);
                 atColumn++;
             }
+            hints.previous();
         }
         else
             successors.add(config);
@@ -84,6 +86,14 @@ public class NonogramConfig implements Configuration {
      */
     @Override
     public boolean isGoal() {
-        return status == board.NUMBER_OF_ROWS;
+        return status+1 == board.NUMBER_OF_ROWS;
+    }
+
+    /**
+     * String representation of Configuration object
+     */
+    @Override
+    public String toString(){
+        return board.getBoard();
     }
 }

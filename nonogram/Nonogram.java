@@ -14,7 +14,7 @@ public class Nonogram {
      */
     public static void main(String[] args) {
 
-        boolean debug = false;
+        boolean debug = true;
 
         // invalid number of arguments
         if(args.length < 1 || args.length > 3){

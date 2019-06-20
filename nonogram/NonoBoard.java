@@ -131,7 +131,7 @@ public class NonoBoard {
      * @return true if successful mark; otherwise, false
      */
     public boolean mark(int row, int col, int len, boolean markdown){
-        if(col+len-NUMBER_OF_COLS > 0 || row < 0 || col < 0 || len < 0)
+        if(col+len > NUMBER_OF_COLS || row < 0 || col < 0 || len < 0)
             return false;
 
         for(int i=col; i<col+len; i++)
@@ -155,12 +155,11 @@ public class NonoBoard {
 	}
 
     /**
-     * String representation of Nonogram puzzle board
-     * @return string format of board
+     * Get a string representation of the board
+     * @return only the board, no hints
      */
-    @Override
-    public String toString(){
-        StringBuilder s = new StringBuilder(border() + "\n");
+	public String getBoard() {
+        StringBuilder s = new StringBuilder(String.format("\n%s\n", border()));
 
         // print the cells
         for( int i=0; i<board.length; i++ ){
@@ -170,6 +169,17 @@ public class NonoBoard {
             }
             s.append("\n").append(border()).append("\n");
         }
+
+        return s.toString();
+    }
+
+    /**
+     * String representation of Nonogram puzzle board
+     * @return string format of board
+     */
+    @Override
+    public String toString(){
+        StringBuilder s = new StringBuilder(getBoard());
 
         s.append( "\n" );
 
