@@ -1,7 +1,7 @@
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.ListIterator;
-import java.util.Random;
 
 /**
  * Class that handles producing multiple successors
@@ -71,16 +71,35 @@ public class NonogramConfig implements Configuration {
     }
 
     /**
-     * Validates by comparing the column hints to the marked cells on the board
+     * Validates by comparing the column hints to the respective columns on the board
      * @return true if valid configuration; otherwise, false
      */
     @Override
     public boolean isValid() {
+
+        for(int column=0; column<board.NUMBER_OF_COLS; column++){
+            ListIterator<Integer> colHints = board.getColHints(column).listIterator();
+            int count = 0, row = 0;
+
+            while(row < board.NUMBER_OF_ROWS && !board.isMarked(row,column))
+                row++;
+
+            for( ; row<board.NUMBER_OF_ROWS; row++){
+               //TODO: What to do here...
+            }
+
+            while(row < board.NUMBER_OF_ROWS)
+                if(board.isMarked(row++,column))
+                    return false;
+
+        }
+
         return true;
+
     }
 
     /**
-     * Goal is reached if the reached all the rows and
+     * Goal is reached if all rows are reached and
      * everything is validated
      * @return true if reached; otherwise, false
      */

@@ -13,9 +13,6 @@ import java.util.Scanner;
  */
 public class NonoBoard {
 
-	private final char MARK = '@';
-	private final char BLANK = ' ';
-
     private boolean[][] board;
 
     private ArrayList<Integer>[] rowHints;
@@ -122,6 +119,11 @@ public class NonoBoard {
         return colHints[column];
     }
 
+
+    public boolean isMarked(int row, int col){
+        return board[row][col];
+    }
+
     /**
      * Mark a row of cells on the board
      * @param row the row to mark the cell(s)
@@ -148,7 +150,7 @@ public class NonoBoard {
 	private String border( ){
 		StringBuilder res = new StringBuilder("+");
 
-		for( int i=0; i<board[0].length; i++ )
+		for( int i=0; i<NUMBER_OF_COLS; i++ )
 			res.append("-+");
 
 		return res.toString();
@@ -164,8 +166,8 @@ public class NonoBoard {
         // print the cells
         for( int i=0; i<board.length; i++ ){
             s.append( "|" );
-            for( int j=0; j<board[0].length; j++ ){
-                s.append( board[i][j] ? MARK : BLANK ).append("|");
+            for( int j=0; j<NUMBER_OF_COLS; j++ ){
+                s.append( board[i][j] ? '@' : ' ').append("|");
             }
             s.append("\n").append(border()).append("\n");
         }
