@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.ListIterator;
@@ -76,17 +75,31 @@ public class NonogramConfig implements Configuration {
      */
     @Override
     public boolean isValid() {
-
         for(int column=0; column<board.NUMBER_OF_COLS; column++){
             ListIterator<Integer> colHints = board.getColHints(column).listIterator();
             int count = 0, row = 0;
+            boolean checking = false;
 
             while(row < board.NUMBER_OF_ROWS && !board.isMarked(row,column))
                 row++;
 
-            for( ; row<board.NUMBER_OF_ROWS; row++){
-               //TODO: What to do here...
+            for( ; row < board.NUMBER_OF_ROWS; row++){
+                if (!colHints.hasNext())
+                    break;
+                else if (board.isMarked(row,column)){
+                    count++;
+                    checking = true;
+                }
+                else if(checking && colHints.next() < count)
+                    return false;
+                else {
+                    count = 0;
+                    checking = false;
+                }
             }
+
+            if (count > 0 && colHints.hasNext() && colHints.next() != count)
+                return false;
 
             while(row < board.NUMBER_OF_ROWS)
                 if(board.isMarked(row++,column))
@@ -95,8 +108,8 @@ public class NonogramConfig implements Configuration {
         }
 
         return true;
-
     }
+
 
     /**
      * Goal is reached if all rows are reached and
@@ -113,6 +126,6 @@ public class NonogramConfig implements Configuration {
      */
     @Override
     public String toString(){
-        return board.getBoard();
+        return board.toString();
     }
 }
