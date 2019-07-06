@@ -1,3 +1,4 @@
+import java.io.*;
 import java.util.Optional;
 
 /**
@@ -35,7 +36,14 @@ public class Backtracker {
      */
     private void debugPrint(String msg, Configuration config) {
         if (this.debug) {
-            System.out.println(msg + ": " + config);
+            try {
+                FileWriter outFile = new FileWriter("debug", true);
+                outFile.write(msg + ": " + config);
+                outFile.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            //System.out.println(msg + ": " + config);
         }
     }
     
