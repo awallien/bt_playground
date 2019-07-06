@@ -14,11 +14,11 @@ public class Nonogram {
      */
     public static void main(String[] args) {
 
-        boolean debug = true;
+        boolean debug = false;
 
         // invalid number of arguments
         if(args.length < 1 || args.length > 3){
-            System.err.println("Usage: java Nonogram config-file [debug = true|false]");
+            System.err.println("Usage: java Nonogram config-file [debug: true|false]");
             System.exit(1);
         }
 
