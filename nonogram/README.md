@@ -102,6 +102,7 @@ time complexity in this case is *O*(n).
 <br/>
 
 The overall time complexity for validating the board is
+
 ![total_cpx_2](https://github.com/awallien/bt_playground/blob/master/nonogram/doc/total_cpx_2.png)
 
 
