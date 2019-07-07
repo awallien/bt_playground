@@ -58,7 +58,6 @@ public class NonoBoard {
             rowHints = initializeHints(file, rowNum);
             file.nextLine();
             colHints = initializeHints(file, colNum);
-
         } catch (FileNotFoundException fnfe) {
 
             System.err.println("[Error] File Not Found: " + configfile);

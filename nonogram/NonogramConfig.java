@@ -49,7 +49,7 @@ public class NonogramConfig implements Configuration {
      */
     @Override
     public Collection<Configuration> getSuccessors() {
-        LinkedList<Configuration> successors = new LinkedList<>();
+        LinkedList<Configuration> successors = new LinkedList<Configuration>();
         ++this.status;
         buildRow(successors, board.getRowHints(this.status).listIterator(), 0, new NonogramConfig(this));
         return successors;

@@ -8,6 +8,7 @@ import java.util.Optional;
  *
  * @author sps (Sean Strout @ RIT CS)
  * @author jeh (James Heliotis @ RIT CS)
+ * @author asw8675 (Alex Wall @ RIT CS) / awallien
  */
 public class Backtracker {
     /*
