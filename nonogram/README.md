@@ -11,7 +11,7 @@ column hints. An example of the puzzle can be seen below.
 # Implementation
 
 Source files for Configuration.java and Backtracker.java are both provided by
-RIT CS from CSCI-142 course lecture code website.
+RIT CS from CSCI-142 course lecture website (https://cs.rit.edu/~csci142/).
 
 The backtracker will find only one solution to this puzzle game. For each row
 on the board, it will generate successors with the hints in that row by building 
