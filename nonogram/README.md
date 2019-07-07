@@ -2,7 +2,11 @@
 
 Nonogram is a popular logic puzzle game in which cells must be filled
 or left blank in order to create a picture based on the given row and
-column hints. 
+column hints. An example of the puzzle can be seen below.
+
+![nono_puzzle](https://github.com/awallien/bt_playground/blob/master/nonogram/doc/nono_puzzle.png)
+
+(Picture credit to: https://www.nonograms.org )
 
 # Implementation
 
