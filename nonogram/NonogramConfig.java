@@ -12,10 +12,14 @@ import java.util.ListIterator;
  */
 public class NonogramConfig implements Configuration {
 
-    /** The Nonogram board for this configuration */
+    /**
+     * The Nonogram board for this configuration
+     */
     private NonoBoard board;
 
-    /** Current row status when checking for goal */
+    /**
+     * Current row status when checking for goal
+     */
     private int status;
 
     /**
@@ -70,8 +74,7 @@ public class NonogramConfig implements Configuration {
                 atColumn++;
             }
             hints.previous();
-        }
-        else
+        } else
             successors.add(config);
     }
 
