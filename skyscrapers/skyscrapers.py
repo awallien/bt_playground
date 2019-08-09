@@ -13,7 +13,6 @@ class Skyscrapers:
         self.board = []
 
         self.is_marked = []
-
         self.hints = {}
 
         self.__read_config_file(config_file)
@@ -31,7 +30,9 @@ class Skyscrapers:
             if line == '\n':
                 continue
             if not self.dim:
-                self.dim = int(config.readline().strip())
+                self.dim = int(line.strip())
+                self.board = [[0 for _ in range(self.dim)] for _ in range(self.dim)]
+                self.is_marked = [[False for _ in range(self.dim)] for _ in range(self.dim)]
             elif not self.board and not self.is_marked and '.' in line:
                 for i in range(self.dim):
                     row = line.split()
@@ -42,16 +43,13 @@ class Skyscrapers:
                     line = config.readline()
                 if sum(self.board) < self.dim or sum(self.board) > self.dim:
                     raise ValueError("Configuration file contains incorrect number of row markings")
-            elif not self.board and not self.is_marked:
-                self.board = [[0 for _ in range(self.dim)] for _ in range(self.dim)]
-                self.is_marked = [[False for _ in range(self.dim) for _ in range(self.dim)]]
-            elif line.startswith("north: "):
+            if line.startswith("north: "):
                 self.hints["north"] = list(map(int, line.split()[1:]))
-            elif line.startswith("east: "):
+            if line.startswith("east: "):
                 self.hints["east"] = list(map(int, line.split()[1:]))
-            elif line.startswith("west: "):
+            if line.startswith("west: "):
                 self.hints["west"] = list(map(int, line.split()[1:]))
-            elif line.startswith("south: "):
+            if line.startswith("south: "):
                 self.hints["south"] = list(map(int, line.split()[1:]))
         config.close()
 
@@ -59,7 +57,15 @@ class Skyscrapers:
         self.board[row][col] = number
 
     def __str__(self):
-        pass
+        res = ""
+        for i in range(self.dim):
+            res += " ".join(map(str, self.board[i])) + "\n"
+        res += f"north: {self.hints['north']}\n"
+        res += f"south: {self.hints['south']}\n"
+        res += f"east: {self.hints['east']}\n"
+        res += f"west: {self.hints['west']}\n"
+
+        return res
 
 
 class SkyscrapersSolver:
@@ -76,12 +82,13 @@ class SkyscrapersSolver:
         pass
 
 
-class SkyscrapersUI:
+class SkyscrapersGUI:
     def __init__(self, solver):
         self.window = self.__mk_window()
         self.solver = solver
 
-    def __mk_window(self):
+    @staticmethod
+    def __mk_window():
         w = tkinter.Tk()
         w.title("Skyscrapers")
         return w
@@ -91,4 +98,4 @@ class SkyscrapersUI:
 
 
 if __name__ == '__main__':
-    Skyscrapers("asdf")
+    print(Skyscrapers("data/valid/data01"))
