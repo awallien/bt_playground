@@ -3,55 +3,34 @@ __author__ = "awallien"
 __revision__ = "1.0"
 __doc__ = "skyscraper solver using the backtracking algorithm"
 
+import json
 import sys
 import tkinter
 
 
 class Skyscrapers:
-    def __init__(self, config_file):
+    def __init__(self, config_fp):
         self.dim = None
         self.board = []
 
         self.is_marked = []
-        self.hints = {}
+        self.hints = {"north":[], "south":[], "east":[], "west":[]}
 
-        self.__read_config_file(config_file)
+        self.__read_config_file(config_fp)
 
-        assert (all(vars(self).values())), "all values for skyscrapers puzzle are not instantiated"
 
-    def __read_config_file(self, config_file):
-        config = open(config_file)
-        line_no = 0
-        while True:
-            line = config.readline()
-            line_no += 1
-            if not line:
-                break
-            if line == '\n':
-                continue
-            if not self.dim:
-                self.dim = int(line.strip())
-                self.board = [[0 for _ in range(self.dim)] for _ in range(self.dim)]
-                self.is_marked = [[False for _ in range(self.dim)] for _ in range(self.dim)]
-            elif not self.board and not self.is_marked and '.' in line:
-                for i in range(self.dim):
-                    row = line.split()
-                    if len(row) < self.dim:
-                        raise ValueError(f"Configuration file contains invalid width size on line {line_no}")
-                    self.board.append(list(map(lambda x: 0 if x == '.' else int(x), row)))
-                    self.is_marked.append(list(map(lambda x: False if x == '.' else True, row)))
-                    line = config.readline()
-                if sum(self.board) < self.dim or sum(self.board) > self.dim:
-                    raise ValueError("Configuration file contains incorrect number of row markings")
-            if line.startswith("north: "):
-                self.hints["north"] = list(map(int, line.split()[1:]))
-            if line.startswith("east: "):
-                self.hints["east"] = list(map(int, line.split()[1:]))
-            if line.startswith("west: "):
-                self.hints["west"] = list(map(int, line.split()[1:]))
-            if line.startswith("south: "):
-                self.hints["south"] = list(map(int, line.split()[1:]))
-        config.close()
+    def __read_config_file(self, config_fp):
+        config_json = json.loads(config_fp)
+        self.dim = config_json['size']
+        self.hints = config_json['hints']
+
+        self.board = [[0]*self.dim]*self.dim
+        self.is_marked = [[False]*self.dim]*self.dim
+        for mark in config_json['marks']:
+            mark_number = mark['number']
+            mark_loc = mark['location']
+            self.board[mark_loc[0]][mark_loc[1]] = mark_number
+            self.is_marked[mark_loc[0]][mark_loc[1]] = True
 
     def mark(self, row, col, number):
         self.board[row][col] = number
@@ -97,5 +76,9 @@ class SkyscrapersGUI:
         self.window.mainloop()
 
 
+def main():
+    print(Skyscrapers(open("data/valid/data0.json").read()))
+
+
 if __name__ == '__main__':
-    print(Skyscrapers("data/valid/data01"))
+    main()
