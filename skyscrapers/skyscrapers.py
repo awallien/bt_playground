@@ -14,18 +14,17 @@ class Skyscrapers:
         self.board = []
 
         self.is_marked = []
-        self.hints = {"north":[], "south":[], "east":[], "west":[]}
+        self.hints = {"north": [], "south": [], "east": [], "west": []}
 
         self.__read_config_file(config_fp)
-
 
     def __read_config_file(self, config_fp):
         config_json = json.loads(config_fp)
         self.dim = config_json['size']
         self.hints = config_json['hints']
 
-        self.board = [[0]*self.dim]*self.dim
-        self.is_marked = [[False]*self.dim]*self.dim
+        self.board = [([0]*self.dim) for _ in range(self.dim)]
+        self.is_marked = [([False]*self.dim) for _ in range(self.dim)]
         for mark in config_json['marks']:
             mark_number = mark['number']
             mark_loc = mark['location']
@@ -48,17 +47,50 @@ class Skyscrapers:
 
 
 class SkyscrapersSolver:
-    def __init__(self, board):
-        self.board = board
+    def __init__(self, skyscrapers):
+        self.skyscrapers = skyscrapers
+        self.solved = False
+        self.__on = 0
 
-    def is_goal(self):
-        pass
+    def solve(self):
+        """run the solver"""
+        self.solved = self.__bt()
 
-    def is_valid(self):
+    def __is_goal(self):
+        """has the backtracker travelled beyond the last cell?"""
+        return self.__on == self.skyscrapers.dim ** 2
+
+    def __is_valid(self):
         return True
 
-    def bt(self):
-        pass
+    def __continue(self):
+        """forward the backtracker to the next location on the board"""
+        self.__on += 1
+        if self.__bt():
+            return True
+        self.__on -= 1
+        return False
+
+    def __bt(self):
+        """main backtracking algorithm"""
+        if self.__is_goal():
+            return True
+
+        col = self.__on % self.skyscrapers.dim
+        row = self.__on // self.skyscrapers.dim
+        if self.skyscrapers.is_marked[row][col] and self.__is_valid():
+            return self.__continue()
+        else:
+            for i in range(1, 1 + self.skyscrapers.dim):
+                self.skyscrapers.mark(row, col, i)
+                if self.__is_valid() and self.__continue():
+                    return True
+            self.skyscrapers.mark(row, col, 0)
+
+            if self.__on == -1:
+                return False
+
+        # implicit backtracking here
 
 
 class SkyscrapersGUI:
@@ -77,7 +109,13 @@ class SkyscrapersGUI:
 
 
 def main():
-    print(Skyscrapers(open("data/valid/data0.json").read()))
+    skyscrapers = Skyscrapers(open("data/valid/data0.json").read())
+    solver = SkyscrapersSolver(skyscrapers)
+    solver.solve()
+    if not solver.solved:
+        print("No solution")
+    else:
+        print(solver.skyscrapers)
 
 
 if __name__ == '__main__':
