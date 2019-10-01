@@ -11,28 +11,60 @@ import tkinter
 class Skyscrapers:
     def __init__(self, config_fp):
         self.dim = None
-        self.board = []
+        self.rows = []
+        self.columns = []
 
         self.is_marked = []
         self.hints = {"north": [], "south": [], "east": [], "west": []}
 
         self.__read_config_file(config_fp)
+        self.__assert_values()
+
+    def __assert_values(self):
+        assert self.dim is not None, "dimension of skyscraper is not defined"
+        assert self.rows, "rows are not defined"
+        assert self.columns, "columns are not defined"
+        assert len(self.hints.keys()) == 4, "not all hints have been read"
+        for title, hint in self.hints:
+            assert (len(hint) == self.dim), f"{title} hints do not have the right amount of hints"
 
     def __read_config_file(self, config_fp):
         config_json = json.loads(config_fp)
         self.dim = config_json['size']
         self.hints = config_json['hints']
 
-        self.board = [([0]*self.dim) for _ in range(self.dim)]
-        self.is_marked = [([False]*self.dim) for _ in range(self.dim)]
+        self.rows = [([0] * self.dim) for _ in range(self.dim)]
+        self.columns = [([0] * self.dim) for _ in range(self.dim)]
+        self.is_marked = [([False] * self.dim) for _ in range(self.dim)]
         for mark in config_json['marks']:
             mark_number = mark['number']
             mark_loc = mark['location']
-            self.board[mark_loc[0]][mark_loc[1]] = mark_number
+            self.rows[mark_loc[0]][mark_loc[1]] = mark_number
+            self.columns[mark_loc[1]][mark_loc[0]] = mark_number
             self.is_marked[mark_loc[0]][mark_loc[1]] = True
 
     def mark(self, row, col, number):
         self.board[row][col] = number
+
+    def get_row_number(self, on):
+        return on // self.dim
+
+    def get_col_number(self, on):
+        return on % self.dim
+
+    def get_row_contents(self, row):
+        return self.rows[row]
+
+    def get_column_contents(self,column):
+        return self.columns[column]
+
+    def get_hints(self, row, col):
+        return (
+            self.hints['north'][col],
+            self.hints['south'][col],
+            self.hints['east'][row],
+            self.hints['west'][row]
+        )
 
     def __str__(self):
         res = ""
@@ -60,8 +92,9 @@ class SkyscrapersSolver:
         """has the backtracker travelled beyond the last cell?"""
         return self.__on == self.skyscrapers.dim ** 2
 
-    def __is_valid(self):
-        return True
+    def __is_valid(self, row, col):
+        n_hint, s_hint, e_hint, w_hint = self.skyscrapers.get_hints(row, col)
+
 
     def __continue(self):
         """forward the backtracker to the next location on the board"""
@@ -76,14 +109,14 @@ class SkyscrapersSolver:
         if self.__is_goal():
             return True
 
-        col = self.__on % self.skyscrapers.dim
-        row = self.__on // self.skyscrapers.dim
-        if self.skyscrapers.is_marked[row][col] and self.__is_valid():
+        col = self.skyscrapers.get_col_number(self.__on)
+        row = self.skyscrapers.get_row_number(self.__on)
+        if self.skyscrapers.is_marked[row][col] and self.__is_valid(row, col):
             return self.__continue()
         else:
             for i in range(1, 1 + self.skyscrapers.dim):
                 self.skyscrapers.mark(row, col, i)
-                if self.__is_valid() and self.__continue():
+                if self.__is_valid(row, col) and self.__continue():
                     return True
             self.skyscrapers.mark(row, col, 0)
 
