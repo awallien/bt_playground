@@ -1,0 +1,18 @@
+{
+  "size": 7,
+  "marks": [
+    {"number": 4, "location": [0,2]},
+    {"number": 3, "location": [0,3]},
+    {"number": 1, "location": [1,2]},
+    {"number": 2, "location": [2,4]},
+    {"number": 4, "location": [4,6]},
+    {"number": 1, "location": [6,3]},
+    {"number": 3, "location": [6,6]}
+  ],
+  "hints": {
+    "north": [0,0,0,0,0,3,5],
+    "south": [3,0,2,3,3,0,0],
+    "east": [0,4,0,0,0,0,3],
+    "west": [0,0,0,3,0,5,0]
+  }
+}

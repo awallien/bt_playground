@@ -1,0 +1,10 @@
+{
+  "size": 1,
+  "marks": [],
+  "hints": {
+    "north": [1],
+    "south": [1],
+    "east": [1],
+    "west": [1]
+  }
+}
