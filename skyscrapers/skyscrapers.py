@@ -117,14 +117,20 @@ class SkyscrapersSolver:
             """
             h1_max_ss = contents[0]
             h2_max_ss = contents[v]
+            hint1_copy = hint1
+            hint2_copy = hint2
+
+            if hint1 == 0 and hint2 == 0:
+                return True
+
             for i in range(1, self.skyscrapers.dim):
                 if contents[i] > h1_max_ss:
-                    hint1 -= 1
+                    hint1_copy -= 1
                     h1_max_ss = contents[i]
                 if contents[self.skyscrapers.dim - i - 1] > h2_max_ss:
-                    hint2 -= 1
+                    hint2_copy -= 1
                     h2_max_ss = contents[self.skyscrapers.dim - i - 1]
-            return hint1 - 1 == 0 and hint2 - 1 == 0
+            return (hint1 == 0 or hint1_copy-1 == 0) and (hint2 == 0 or hint2_copy-1 == 0)
 
         row_contents = self.skyscrapers.get_row_contents(row)
         col_contents = self.skyscrapers.get_column_contents(col)
@@ -189,8 +195,8 @@ class SkyscrapersGUI:
         self.window.mainloop()
 
 
-def main():
-    skyscrapers = Skyscrapers(open("data/valid/data02.json").read())
+def main(json_file):
+    skyscrapers = Skyscrapers(open(json_file).read())
     solver = SkyscrapersSolver(skyscrapers)
     solver.solve()
     if not solver.solved:
@@ -200,4 +206,7 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    if len(sys.argv) != 2:
+        print("Usage: python3 skyscrapers.py <json-file>")
+
+    main(sys.argv[1])
