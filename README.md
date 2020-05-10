@@ -15,10 +15,11 @@ otherwise, the backtracker would continue until it reaches a certain goal.
 * To explore different languages to program a backtracking algorithm.
 
 ## Programs and Languages 
-* C99
+* C/C++
   + binairo
 * Java
   + nonogram (6+)
 * Python 3.x
   + connect4tie
- 
+  + skyscrapers
+  + word_ladder
