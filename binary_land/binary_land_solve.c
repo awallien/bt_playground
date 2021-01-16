@@ -13,64 +13,108 @@
 ///		9/26/2020
 ///
 
+#define _DEFAULT_SOURCE
+
 #include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
+#include "binary_land_hash_set.h"
 #include "binary_land_solve.h"
 #include "binary_land_stage.h"
+#include "priority_queue.h"
 
 #define CARRIAGE_RETURN '\r'
 #define NEWLINE '\n'
 #define KEY_ESC 27
 
+#define DELAY() usleep( delay )
+#define POS( stage, which, buf ) pos_BinaryLandStage( stage, which, buf, buf + 1 )
+#define PRINT_STAGE_DELAY() ncurses_print_stage(); DELAY()
+
+
+static BinaryLandHashSet hashset = NULL;
+static PriorityQueue pq = NULL;
+
 static BinaryLandStage stage = NULL;
+static char** board;
+static int nrows, ncols;
+static int left[2], right[2], goal[2];
 
-static bool animate = false;
-
-static long delay = 0;
+static double delay = 100000;
 
 void 
-init_solve_BinaryLand( BinaryLandStage s, bool a, long d )
+init_solve_BinaryLand( BinaryLandStage s, double d )
 {
 	stage = s;
-	animate = a;
-	delay = d;
+	board = board_BinaryLandStage( stage, &nrows, &ncols );
+	delay *= d;
 }
 
 static void
 ncurses_print_stage( )
 {
 	move( 0, 0 );
-	int nrow, ncol;
-	char** board = board_BinaryLandStage( stage, &nrow, &ncol );
+
+	POS( stage, char_goal, goal );
+	POS( stage, char_left_brkt, left );
+	POS( stage, char_right_brkt, right );
+
 	int r,c;
-	for( r=0; r<nrow; r++ ) {
-		char buffer[ncol*2+2];
-		for( c=0; c<ncol; c++ ) {
+	
+	char buffer[ncols*2+2];
+	for( r=0; r<nrows; r++ ) {
+		for( c=0; c<ncols; c++ ) {
 			buffer[c*2] = board[r][c];
 			buffer[c*2+1] = ' ';
 		}
-		buffer[ncol*2] = NEWLINE;
-		buffer[ncol*2+1] = 0;
+		
+		// precedence of printing characters to board: Left, Right, Goal
+		if ( r == goal[0] )
+			buffer[goal[1]*2] = char_BinaryLandStage( char_goal );
+		if ( r == right[0] )
+			buffer[right[1]*2] = char_BinaryLandStage( char_right_brkt );
+		if ( r == left[0] )
+			buffer[left[1]*2] = char_BinaryLandStage( char_left_brkt );
+		
+		buffer[ncols*2] = NEWLINE;
+		buffer[ncols*2+1] = 0;
 		addstr( buffer );
 	}
+	refresh();
 }
 
 /// A* search with a priority queue
 static bool
 solve_A_search( ) 
 {
-
+	
 }
 
 /// bt method is basically DFS
 static bool 
 solve_bt( ) 
 {
- 
+	PRINT_STAGE_DELAY();
 
+	// goal
+	if ( is_solved_BinaryLandStage( stage ) )
+		return true;
 
+	for( int d = dir_left; d <= dir_down; d++ ) {
+		if ( can_move_BinaryLandStage( stage, d ) ) {
+			move_BinaryLandStage( stage, d );
+			POS( stage, char_left_brkt, left );
+			POS( stage, char_right_brkt, right );
+			if ( !seen_BinaryLandHashSet( hashset, left, right ) && solve_bt( ) )
+				return true;
+			reverse_move_BinaryLandStage( stage, d );
+			PRINT_STAGE_DELAY();
+		}
+	}
+
+	return false;
 }
 
 /// manual interaction with user input
@@ -80,9 +124,7 @@ solve_manual( )
 	ncurses_print_stage();
 	int ch;
 	while( !is_solved_BinaryLandStage( stage ) ) {
-		if( ( ch = getch() ) == ERR ) {
-			// empty
-		} else {
+		if( ( ch = getch() ) != ERR ) {
 			switch( ch ) {
 				case KEY_UP:
 					move_BinaryLandStage( stage, dir_up );
@@ -107,8 +149,6 @@ solve_manual( )
 		}
 	}
 
-	// should print the heart on solved
-	ncurses_print_stage();
 	return true;
 }
 
@@ -126,6 +166,7 @@ solve_BinaryLand( char mode )
 	cbreak();
 	noecho();
 	keypad( stdscr, true );
+	curs_set(0);
 	move( 0, 0 );
 	refresh();
 
@@ -136,9 +177,12 @@ solve_BinaryLand( char mode )
 			break;
 
 		case 'B':
+		{
+			hashset = ctor_BinaryLandHashSet( nrows, ncols );
 			is_solved = solve_bt( );
+			dtor_BinaryLandHashSet( hashset );
 			break;
-		
+		}
 		case 'C':
 			is_solved = solve_manual( );
 			break;
@@ -148,8 +192,8 @@ solve_BinaryLand( char mode )
 			break;
 	}
 
-	printw( is_solved ? "Solved!\n" : "Game Over");
-	getch();
+	printw( is_solved ? "Solved!\nPress Enter to Exit." : "Game Over");
+	while( getch() != NEWLINE );
 	endwin();
 
 	return is_solved;

@@ -26,7 +26,7 @@
 
 /// print usage to stderr
 #define PRINT_USAGE \
-	fprintf( stderr, "\nUsage: binary_land [-f filename] [-m A (A* search) | B (bt) | C (manual)] [-a delay] [-i]\n\n" )
+	fprintf( stderr, "\nUsage: binary_land [-f filename] [-m A (A* search) | B (bt) | C (manual)] [-a delay]\n\n" )
 
 #define CLOSE_FILE( f ) \
 	if ( f ) fclose( f );
@@ -39,22 +39,21 @@ int main(int argc, char* argv[])
 {
 	FILE* config_file = stdin;
 	char mode = 'B';	
-	bool animate = false;
-	long delay = 1000;
+	double delay = 1;
 
 	char flag;
-	while( ( flag = getopt( argc, argv, "a::m:f:" ) ) != -1 ){
+	while( ( flag = getopt( argc, argv, "a:m:f:" ) ) != -1 ){
 		switch( flag ) {
 			case 'a':
 			{
-				animate = true;
 				if ( optarg ) {
-					delay = strtol( optarg, &optarg, 10 );
+					delay = strtod( optarg, &optarg );
 					if ( *optarg ) {
 						CLOSE_FILE( config_file );
 						fprintf( stderr, "Error: invalid delay value\n" );
 						return EXIT_FAILURE;
 					}	
+					delay = delay > 0 ? delay : 1;
 				}
 				break;	
 			}
@@ -85,13 +84,16 @@ int main(int argc, char* argv[])
 		}
 	}
 
+	if ( config_file == stdin ) 
+		fprintf( stdin, "Enter configuration below: \n" );
+	
 	BinaryLandStage stage = ctor_BinaryLandStage( config_file );
 	CLOSE_FILE( config_file );
 
 	if( stage == NULL )
 		return EXIT_FAILURE;
 
-	init_solve_BinaryLand( stage, animate, delay );
+	init_solve_BinaryLand( stage, delay );
 	solve_BinaryLand( mode );
 
 	dtor_BinaryLandStage(stage);

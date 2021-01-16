@@ -26,12 +26,10 @@
 ///
 /// @param stage the Binary Land Stage
 ///
-/// @param animate toggle animation of the brackets in the stage
-///
 /// @param delay if animated, the delay between frames
 ///
 ///
-void init_solve_BinaryLand( BinaryLandStage stage, bool animate, long delay ); 
+void init_solve_BinaryLand( BinaryLandStage stage, double delay ); 
 
 
 ///

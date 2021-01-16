@@ -1,5 +1,5 @@
 #
-# Created by gmakemake (Ubuntu Jul 25 2014) on Wed Dec 30 22:41:26 2020
+# Created by gmakemake (Ubuntu Jul 25 2014) on Fri Jan 15 22:54:05 2021
 #
 
 #
@@ -45,7 +45,7 @@ CPP = $(CPP) $(CPPFLAGS)
 
 ########## Default flags (redefine these with a header.mak file if desired)
 CXXFLAGS =	
-CFLAGS =	-ggdb -Wall -Wextra -pedantic -std=c99 -O2
+CFLAGS =	-O2 -Wall -Wextra -pedantic -std=c99 
 CLIBFLAGS =	-lm -lncurses
 CCLIBFLAGS =	
 ########## End of default flags
@@ -54,13 +54,13 @@ CCLIBFLAGS =
 
 
 CPP_FILES =	
-C_FILES =	binary_land.c binary_land_solve.c binary_land_stage.c get_line.c priority_queue.c
+C_FILES =	binary_land.c binary_land_hash_set.c binary_land_solve.c binary_land_stage.c get_line.c priority_queue.c
 PS_FILES =	
 S_FILES =	
-H_FILES =	binary_land_solve.h binary_land_stage.h get_line.h priority_queue.h
+H_FILES =	binary_land_hash_set.h binary_land_solve.h binary_land_stage.h get_line.h priority_queue.h
 SOURCEFILES =	$(H_FILES) $(CPP_FILES) $(C_FILES) $(S_FILES)
 .PRECIOUS:	$(SOURCEFILES)
-OBJFILES =	binary_land_solve.o binary_land_stage.o get_line.o priority_queue.o 
+OBJFILES =	binary_land_hash_set.o binary_land_solve.o binary_land_stage.o get_line.o priority_queue.o 
 
 #
 # Main targets
@@ -76,7 +76,8 @@ binary_land:	binary_land.o $(OBJFILES)
 #
 
 binary_land.o:	binary_land_solve.h binary_land_stage.h
-binary_land_solve.o:	binary_land_solve.h binary_land_stage.h
+binary_land_hash_set.o:	binary_land_hash_set.h
+binary_land_solve.o:	binary_land_hash_set.h binary_land_solve.h binary_land_stage.h priority_queue.h
 binary_land_stage.o:	binary_land_stage.h get_line.h
 get_line.o:	get_line.h
 priority_queue.o:	priority_queue.h

@@ -58,7 +58,7 @@ void dtor_BinaryLandStage( BinaryLandStage stage );
 ///
 /// @param out the file to print the output
 ///
-void debug_BinaryLandStage( BinaryLandStage stage, FILE* out );
+//void debug_BinaryLandStage( BinaryLandStage stage, FILE* out );
 
 ///
 /// move_BinaryLandStage
@@ -75,6 +75,32 @@ void debug_BinaryLandStage( BinaryLandStage stage, FILE* out );
 bool move_BinaryLandStage( BinaryLandStage stage, Direction dir );
 
 ///
+/// can_move_BinaryLandStage
+///
+/// given a direction, do one or both of the brackets change position?
+///
+/// @param stage Binary Land stage
+/// 
+/// @param dir direction to move left bracket
+/// 
+/// @return true if one of the brackets change position; otherwise, false
+///
+bool can_move_BinaryLandStage( BinaryLandStage stage, Direction dir );
+
+///
+/// reverse_move_BinaryLandStage
+///
+/// given a direction, move the brackets in the opposite, given direction
+///
+/// @param stage Binary Land stage
+///
+/// @param dir direction to move left bracket
+///
+/// @return true if move can be made; otherwise, false
+///
+bool reverse_move_BinaryLandStage( BinaryLandStage stage, Direction dir );
+
+///
 /// board_BinaryLandStage
 ///
 /// returns the entire board of the Binary Land stage
@@ -88,6 +114,17 @@ bool move_BinaryLandStage( BinaryLandStage stage, Direction dir );
 /// @return the 2d array stage
 ///
 char** board_BinaryLandStage( BinaryLandStage stage, int* nrows_ptr, int* ncols_ptr );
+
+///
+/// char_BinaryLandStage
+///
+/// retrieves the character representation of a Character enum value
+///
+/// @param c the Character
+///
+/// @return the char representation
+///
+char char_BinaryLandStage( Character c );
 
 ///
 /// pos_BinaryLandStage

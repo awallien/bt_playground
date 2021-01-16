@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+
 struct binarylandstage_s {
 	int nrows;
 	int ncols;
@@ -42,6 +43,7 @@ struct binarylandstage_s {
 #define WALL 'x'
 #define NEWLINE '\n'
 
+#define IS_NOT_WALL( stage, row, col ) BOARD( stage, row, col ) != WALL
 
 /// if condition met, print the error and, if any, free the objects
 #define FAIL_COND_RET_NULL( cond, obj_to_free, line_to_free, error_msg, ... )	\
@@ -144,7 +146,7 @@ ctor_BinaryLandStage( FILE* file )
 
 	// find start positions, goal positions, and the whole board
 	for(int r=0; r<nrows; r++){
-		read_line = get_line(&line, &dummy, file);
+		read_line = get_line( &line, &dummy, file );
 		FAIL_COND_RET_NULL( read_line < 0, s, line, 
 			"Error: [%d] empty row line\n", r );	
 
@@ -179,8 +181,7 @@ ctor_BinaryLandStage( FILE* file )
 					FAIL_COND_RET_NULL( 1, s, line, 
 						"Error: invalid chr on line %d: %s\n", r+1, line);
 			}
-			if( ch != NEWLINE )
-				s->board[r][c] = ch; 
+			s->board[r][c] = ch != NEWLINE && ch != LEFT_BRKT && ch != RIGHT_BRKT ? ch : EMPTY; 
 		}
 
 		free( line );	
@@ -198,37 +199,30 @@ ctor_BinaryLandStage( FILE* file )
 }
 
 /// debug print
-void 
-debug_BinaryLandStage( BinaryLandStage stage, FILE* out_file )
-{
-	if ( stage ) {
-		fprintf( out_file, "Size: %dx%d\nG: [%d,%d]\nStart\n  [: [%d,%d]\n  ]: [%d,%d]\n",
-					stage->nrows, stage->ncols,
-					stage->goal_pos[0], stage->goal_pos[1],
-					stage->left_brkt_pos[0], stage->left_brkt_pos[1],
-					stage->right_brkt_pos[0], stage->right_brkt_pos[1]
-			   );
+// void 
+// debug_BinaryLandStage( BinaryLandStage stage, FILE* out_file )
+// {
+// 	if ( stage ) {
+// 		fprintf( out_file, "Size: %dx%d\nG: [%d,%d]\nStart\n  [: [%d,%d]\n  ]: [%d,%d]\n",
+// 					stage->nrows, stage->ncols,
+// 					stage->goal_pos[0], stage->goal_pos[1],
+// 					stage->left_brkt_pos[0], stage->left_brkt_pos[1],
+// 					stage->right_brkt_pos[0], stage->right_brkt_pos[1]
+// 			   );
 
-		int r, c;
-		for( r=0; r<stage->nrows; r++ ) {
-			char buffer[stage->ncols+2];
-			for( c=0; c<stage->ncols; c++ )
-				buffer[c] = stage->board[r][c];
-			buffer[stage->ncols] = '\n';
-			buffer[stage->ncols+1] = '\0';
-			fputs( buffer, out_file );
-		}
-	}
+// 		int r, c;
+// 		for( r=0; r<stage->nrows; r++ ) {
+// 			char buffer[stage->ncols+2];
+// 			for( c=0; c<stage->ncols; c++ )
+// 				buffer[c] = stage->board[r][c];
 
-}
+// 			buffer[stage->ncols] = '\n';
+// 			buffer[stage->ncols+1] = '\0';
+// 			fputs( buffer, out_file );
+// 		}
+// 	}
 
-static bool
-adjacent_BinaryLandStage( BinaryLandStage stage )
-{
-	return ROW_POS( stage, left_brkt ) == ROW_POS( stage, right_brkt ) &&
-			abs( COL_POS( stage, left_brkt ) - COL_POS( stage, right_brkt ) ) == 1;
-}
-
+// }
 
 /// move the left and right brackets on the stage, dependent on the
 /// movement of the left bracket, right bracket moves polar opposite
@@ -243,21 +237,12 @@ move_BinaryLandStage( BinaryLandStage stage, Direction dir )
 
 			if ( right_brkt_col < stage->ncols &&
 					BOARD( stage, ROW_POS( stage, right_brkt ), right_brkt_col ) != WALL ) {				 
-				BOARD( stage, ROW_POS( stage, right_brkt ), COL_POS( stage, right_brkt )) = EMPTY;
-				BOARD( stage, ROW_POS( stage, right_brkt ), right_brkt_col ) = RIGHT_BRKT;
 				COL_POS( stage, right_brkt ) = right_brkt_col;
 			}
 	
 			if ( left_brkt_col >= 0 &&
 					BOARD( stage, ROW_POS( stage, left_brkt ), left_brkt_col ) != WALL ) {
-				BOARD( stage, ROW_POS( stage, left_brkt ), COL_POS( stage, left_brkt ) ) = EMPTY;
-				BOARD( stage, ROW_POS( stage, left_brkt ), left_brkt_col ) = LEFT_BRKT;
 				COL_POS( stage, left_brkt ) = left_brkt_col;
-			}
-
-			if ( adjacent_BinaryLandStage( stage ) ) {
-				BOARD( stage, ROW_POS( stage, left_brkt ), left_brkt_col ) = LEFT_BRKT;
-				BOARD( stage, ROW_POS( stage, right_brkt ), right_brkt_col ) = RIGHT_BRKT;
 			}
 
 			break;
@@ -268,22 +253,13 @@ move_BinaryLandStage( BinaryLandStage stage, Direction dir )
 			int right_brkt_col = COL_POS( stage, right_brkt) - 1;
 
 			if ( right_brkt_col >= 0 &&
-					BOARD( stage, ROW_POS( stage, right_brkt ), right_brkt_col ) != WALL ) {
-				BOARD( stage, ROW_POS( stage, right_brkt ), COL_POS( stage, right_brkt ) ) = EMPTY;	
-				BOARD( stage, ROW_POS( stage, right_brkt ), right_brkt_col ) = RIGHT_BRKT;			 
+					BOARD( stage, ROW_POS( stage, right_brkt ), right_brkt_col ) != WALL ) {			 
 				COL_POS( stage, right_brkt ) = right_brkt_col;
 			}
 
 			if ( left_brkt_col < stage->ncols &&
 					BOARD( stage, ROW_POS( stage, left_brkt ), left_brkt_col ) != WALL ) {
-				BOARD( stage, ROW_POS( stage, left_brkt ), COL_POS( stage, left_brkt ) ) = EMPTY;
-				BOARD( stage, ROW_POS( stage, left_brkt ), left_brkt_col ) = LEFT_BRKT;
 				COL_POS( stage, left_brkt ) = left_brkt_col;
-			}
-
-			if ( adjacent_BinaryLandStage( stage ) ) {
-				BOARD( stage, ROW_POS( stage, left_brkt ), left_brkt_col ) = LEFT_BRKT;
-				BOARD( stage, ROW_POS( stage, right_brkt ), right_brkt_col ) = RIGHT_BRKT;
 			}
 
 			break;
@@ -295,21 +271,12 @@ move_BinaryLandStage( BinaryLandStage stage, Direction dir )
 
 			if ( right_brkt_row >= 0 &&
 					BOARD( stage, right_brkt_row, COL_POS( stage, right_brkt ) ) != WALL ) {
-				BOARD( stage, ROW_POS( stage, right_brkt ), COL_POS( stage, right_brkt ) ) = EMPTY;
-				BOARD( stage, right_brkt_row, COL_POS( stage, right_brkt ) ) = RIGHT_BRKT;
 				ROW_POS( stage, right_brkt ) = right_brkt_row;
 			}
 
 			if ( left_brkt_row >= 0 && 
 					BOARD( stage, left_brkt_row, COL_POS( stage, left_brkt ) ) != WALL ) {
-				BOARD( stage, ROW_POS( stage, left_brkt ), COL_POS( stage, left_brkt ) ) = EMPTY;
-				BOARD( stage, left_brkt_row, COL_POS( stage, left_brkt ) ) = LEFT_BRKT;
 				ROW_POS( stage, left_brkt ) = left_brkt_row;
-			}
-
-			if ( adjacent_BinaryLandStage( stage ) ) {
-				BOARD( stage, left_brkt_row, COL_POS( stage, left_brkt ) ) = LEFT_BRKT;
-				BOARD( stage, right_brkt_row, COL_POS( stage, right_brkt ) ) = RIGHT_BRKT;
 			}
 			
 			break;
@@ -321,23 +288,14 @@ move_BinaryLandStage( BinaryLandStage stage, Direction dir )
 
 			if ( right_brkt_row < stage->nrows &&
 					BOARD( stage, right_brkt_row, COL_POS( stage, right_brkt ) ) != WALL ) {
-				BOARD( stage, ROW_POS( stage, right_brkt ), COL_POS( stage, right_brkt ) ) = EMPTY;
-				BOARD( stage, right_brkt_row, COL_POS( stage, right_brkt ) ) = RIGHT_BRKT;
 				ROW_POS( stage, right_brkt ) = right_brkt_row;
 			}
 
 			if ( left_brkt_row < stage->nrows && 
 					BOARD( stage, left_brkt_row, COL_POS( stage, left_brkt ) ) != WALL ) {
-				BOARD( stage, ROW_POS( stage, left_brkt ), COL_POS( stage, left_brkt ) ) = EMPTY;
-				BOARD( stage, left_brkt_row, COL_POS( stage, left_brkt ) ) = LEFT_BRKT;
 				ROW_POS( stage, left_brkt ) = left_brkt_row;
 			}
 
-			if ( adjacent_BinaryLandStage( stage ) ) {
-				BOARD( stage, left_brkt_row, COL_POS( stage, left_brkt ) ) = LEFT_BRKT;
-				BOARD( stage, right_brkt_row, COL_POS( stage, right_brkt ) ) = RIGHT_BRKT;
-			}
-			
 			break;
 		}
 		default:
@@ -345,25 +303,94 @@ move_BinaryLandStage( BinaryLandStage stage, Direction dir )
 			return false;
 	};
 
-	// precedence of what char appears at the goal position: left brkt, right brkt, GOAL
-	if ( ROW_POS( stage, goal ) == ROW_POS( stage, left_brkt ) && COL_POS( stage, goal ) == COL_POS( stage, left_brkt ) ) {
-		BOARD( stage, ROW_POS( stage, goal ), COL_POS( stage, goal ) ) = LEFT_BRKT;
-	} else if ( ROW_POS( stage, goal ) == ROW_POS( stage, right_brkt ) && COL_POS( stage, goal ) == COL_POS( stage, right_brkt ) ) {
-		BOARD( stage, ROW_POS( stage, goal ), COL_POS( stage, goal ) ) = RIGHT_BRKT;
-	} else {
-		BOARD( stage, ROW_POS( stage, goal ), COL_POS( stage, goal ) ) = GOAL;
-	}
-
 	return true;
 } 
 
-/// get the board
+/// true if one of the brackets is able to change position; otherwise false
+bool 
+can_move_BinaryLandStage( BinaryLandStage stage, Direction dir )
+{
+	int pos_right_brkt, pos_left_brkt;
+	switch( dir ) {
+		case dir_left:
+		{
+			pos_right_brkt = COL_POS( stage, right_brkt ) + 1;
+			pos_left_brkt = COL_POS( stage, left_brkt ) - 1;
+
+			return ( pos_right_brkt < stage->ncols && IS_NOT_WALL( stage, ROW_POS( stage, right_brkt ), pos_right_brkt ) ) || 
+					( pos_left_brkt >= 0 && IS_NOT_WALL( stage, ROW_POS( stage, left_brkt ), pos_left_brkt ) );
+		}
+		case dir_right:
+		{
+			pos_right_brkt = COL_POS( stage, right_brkt ) - 1;
+			pos_left_brkt = COL_POS( stage, right_brkt ) + 1;
+
+			return ( pos_right_brkt >= 0 && IS_NOT_WALL( stage, ROW_POS( stage, right_brkt ), pos_right_brkt ) ) ||
+					( pos_left_brkt < stage->ncols && IS_NOT_WALL( stage, ROW_POS( stage, left_brkt ), pos_left_brkt ) );
+		}
+		case dir_up:
+		{
+			pos_right_brkt = ROW_POS( stage, right_brkt ) - 1;
+			pos_left_brkt = ROW_POS( stage, left_brkt ) - 1;
+
+			return ( pos_right_brkt >= 0 && IS_NOT_WALL( stage, pos_right_brkt, COL_POS( stage, right_brkt ) ) ) ||
+					( pos_left_brkt >= 0 && IS_NOT_WALL( stage, pos_left_brkt, COL_POS( stage, left_brkt ) ) ); 
+		}
+		case dir_down:
+		{
+			pos_right_brkt = ROW_POS( stage, right_brkt ) + 1;
+			pos_left_brkt = ROW_POS( stage, left_brkt ) + 1;
+
+			return ( pos_right_brkt < stage->nrows && IS_NOT_WALL( stage, pos_right_brkt, COL_POS( stage, right_brkt ) ) ) ||
+					( pos_left_brkt < stage->nrows && IS_NOT_WALL( stage, pos_left_brkt, COL_POS( stage, left_brkt ) ) ); 
+		}
+		default:
+			fprintf( stderr, "Unknown Direction value: %d\n", dir );
+			return false;
+	}
+}
+
+bool 
+reverse_move_BinaryLandStage( BinaryLandStage stage, Direction dir )
+{
+	switch( dir ) {
+		case dir_left:
+			return move_BinaryLandStage( stage, dir_right );
+		case dir_right:
+			return move_BinaryLandStage( stage, dir_left );
+		case dir_up:
+			return move_BinaryLandStage( stage, dir_down );
+		case dir_down:
+			return move_BinaryLandStage( stage, dir_up );
+		default:
+			fprintf( stderr, "Unknown Direction value: %d\n", dir );
+			return false;
+	}
+}
+
+/// get the board and assign values to pointers
 char**
 board_BinaryLandStage( BinaryLandStage stage, int* nrows_ptr, int* ncols_ptr )
 {
 	*nrows_ptr = stage->nrows;
 	*ncols_ptr = stage->ncols;
 	return stage->board;
+}
+
+char
+char_BinaryLandStage( Character c )
+{
+	switch(c) {
+		case char_left_brkt:
+			return LEFT_BRKT;
+		case char_right_brkt:
+			return RIGHT_BRKT;
+		case char_goal:
+			return GOAL;
+		default:
+			fprintf( stderr, "Invalid Character value: %d", c );
+			return EMPTY;
+	}
 }
 
 /// get position of a character
@@ -418,10 +445,10 @@ free_board( char** board, int nrows )
 void 
 dtor_BinaryLandStage( BinaryLandStage stage )
 {
-	if(stage) {
-		if (stage->board)
-			free_board(stage->board, stage->nrows);
-		free(stage);
+	if( stage ) {
+		if ( stage->board )
+			free_board( stage->board, stage->nrows );
+		free( stage );
 	}
     stage = NULL;
 }
