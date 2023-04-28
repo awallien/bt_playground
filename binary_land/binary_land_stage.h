@@ -19,6 +19,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+#define u_int unsigned int
 
 /// object representation of a binary land stage
 typedef struct binarylandstage_s* BinaryLandStage;
@@ -39,6 +40,17 @@ typedef enum { char_left_brkt, char_right_brkt, char_goal } Character;
 /// @return instance of BinaryLandStage
 ///
 BinaryLandStage ctor_BinaryLandStage( FILE* pfile );
+
+/// 
+/// ctor_moves_BinaryLandStage
+///
+/// allocates memory for number of moves (or hops) to get the brackets to goal
+///
+/// @param stage the Binary Land stage
+///
+/// @return instance of Binary Land stage's number of moves board
+/// 
+u_int ** ctor_moves_BinaryLandStage( BinaryLandStage stage );
 
 ///
 /// dtor_BinaryLandStage

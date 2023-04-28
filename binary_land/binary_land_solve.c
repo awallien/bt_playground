@@ -42,6 +42,7 @@ static char** board;
 static int nrows, ncols;
 static int left[2], right[2], goal[2];
 
+/* default delay is 1 second */
 static double delay = 100000;
 
 void 
@@ -90,6 +91,7 @@ static bool
 solve_A_search( ) 
 {
 	
+	return false;
 }
 
 /// bt method is basically DFS

@@ -15,23 +15,32 @@
 ///
 
 #include <ctype.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "priority_queue.h"
 
 
 struct binarylandstage_s {
 	int nrows;
 	int ncols;
-	char** board;
+	char **board;
+	unsigned int **num_moves;
 	int left_brkt_pos[2];
 	int right_brkt_pos[2];
 	int goal_pos[2];
 };
 
-#define ROW_POS( stage, which ) stage-> which##_pos[0]
-#define COL_POS( stage, which ) stage-> which##_pos[1]
-#define BOARD( stage, row, col ) stage-> board[row][col]
+typedef struct _bls_pq_node_t {
+	int pos[2];
+	int nhops;
+}
+
+#define ROW_POS( stage, which ) (stage -> which##_pos[0])
+#define COL_POS( stage, which ) (stage -> which##_pos[1])
+#define BOARD( stage, row, col ) (stage -> board[row][col])
 
 #include "binary_land_stage.h"
 #include "get_line.h"
@@ -43,7 +52,9 @@ struct binarylandstage_s {
 #define WALL 'x'
 #define NEWLINE '\n'
 
-#define IS_NOT_WALL( stage, row, col ) BOARD( stage, row, col ) != WALL
+#define IS_NOT( stage, row, col, ch ) (BOARD( stage, row, col ) != ch)
+#define IS_NOT_WALL( stage, row, col ) (BOARD( stage, row, col ) != WALL)
+
 
 /// if condition met, print the error and, if any, free the objects
 #define FAIL_COND_RET_NULL( cond, obj_to_free, line_to_free, error_msg, ... )	\
@@ -188,6 +199,8 @@ ctor_BinaryLandStage( FILE* file )
 		line = NULL;
 	}
 
+	s->num_moves = NULL;
+
 	FAIL_COND_RET_NULL( s->left_brkt_pos[0] == -1, s, line, 
 		"Error: left bracket position is not found%s\n", ""  );
 	FAIL_COND_RET_NULL( s->right_brkt_pos[0] == -1, s, line,
@@ -250,7 +263,7 @@ move_BinaryLandStage( BinaryLandStage stage, Direction dir )
 		case dir_right:
 		{
 			int left_brkt_col = COL_POS( stage, left_brkt ) + 1;
-			int right_brkt_col = COL_POS( stage, right_brkt) - 1;
+			int right_brkt_col = COL_POS( stage, right_brkt ) - 1;
 
 			if ( right_brkt_col >= 0 &&
 					BOARD( stage, ROW_POS( stage, right_brkt ), right_brkt_col ) != WALL ) {			 
@@ -427,10 +440,118 @@ is_solved_BinaryLandStage( BinaryLandStage stage )
 			COL_POS( stage, right_brkt ) == COL_POS( stage, goal ) + 1;
 }
 
+static void
+get_adj_tiles( BinaryLandStage stage, int pos[2], int adj_tiles[4][2], int *num_adj_tiles)
+{
+#define IS_VALID_POS( r, c ) (r >= 0 && c >=0 && r < stage->nrows && c < stage->ncols )
+	
+	int r_pos = pos[0];
+	int c_pos = pos[1];
+	int r_idx, c_idx;
+	int r, c;
+	int adj_cnt = 0;
+
+	for ( r_idx = -1; r_idx <= 1; r_idx+=2 )
+		for ( c_idx = -1; c_idx <= 1; c_idx+=2 )
+			r = r_pos + r_idx;
+			c = c_pos + c_idx;
+			if ( IS_VALID_POS( r, c ) && 
+			     IS_NOT_WALL( stage, r, c ) && 
+				 IS_NOT( stage, r, c, GOAL ) ) {
+				adj_tiles[adj_cnt][0] = r;
+				adj_tiles[adj_cnt][1] = c;
+				++adj_cnt;
+			}
+
+	*num_adj_tiles = adj_cnt;
+}
+
+/// calculate the number of moves/hop for each white space in board
+///  @pre stage->num_moves should NOT be NULL
+static void
+calc_moves( BinaryLandStage stage )
+{
+	PriorityQueue pq = NULL;
+	int 	*goal_pos,
+			 nrows,
+			 ncols;
+	int		 r_idx, c_idx;
+	u_int  **num_moves;
+	char   **board;
+	int    adj_tiles[4][2];
+	int    num_adj_tiles = 0;
+	int    hops = 0;
+	
+	goal_pos = stage->goal_pos;
+	nrows = stage->nrows;
+	ncols = stage->ncols;
+	num_moves = stage->num_moves;
+	board = stage->board;
+	pq = ctor_PriorityQueue();
+
+	/* Scan board first for any walls */
+	for ( r_idx = 0; r_idx < nrows; r_idx++ ) {
+		for ( c_idx = 0; c_idx < ncols; c_idx++ ) {
+			if ( !IS_NOT_WALL(stage, r_idx, c_idx) ) {
+				num_moves[r_idx][c_idx] = UINT_MAX;
+			}
+		}
+	}
+
+	get_adj_tiles( stage, goal_pos, adj_tiles, &num_adj_tiles );
+
+	for ( r_idx = 0; r_idx < num_adj_tiles; r_idx++ ) {
+		
+	}
+
+	dtor_PriorityQueue( pq );
+}
+
+
+/// allocate moves and calculate the number of moves for each white space to goal
+u_int **
+ctor_moves_BinaryLandStage( BinaryLandStage stage )
+{
+	FAIL_COND_RET_NULL( !stage, NULL, NULL, "Error: stage is null%s\n", "" );
+
+	int r_idx = 0;
+
+	if ( stage->num_moves != NULL )
+		return stage->num_moves;
+
+	stage->num_moves = calloc( stage->nrows, sizeof( u_int * ) );
+	FAIL_COND_RET_NULL( !stage->num_moves, NULL, NULL, 
+						"Error: Unable to allocate memory for stage of num moves%s\n",
+						"" );
+	
+	for ( r_idx = 0; r_idx < stage->nrows; r_idx++ ) {
+		stage->num_moves[r_idx] = calloc( stage->ncols, sizeof( u_int ) );
+		FAIL_COND_RET_NULL( !stage->num_moves[r_idx], NULL, NULL, 
+							"Error: Unable to allocate memory for stage of num moves%s\n",
+							"" );
+	}
+
+	calc_moves( stage );
+
+	return stage->num_moves;
+}
+
 
 /// deallocating the board's stage by row
 static void 
 free_board( char** board, int nrows )
+{
+	for(int r=0; r<nrows; r++){
+		if(board[r])
+			free(board[r]);
+	}
+	free(board);
+	board = NULL;
+}
+
+/// deallocating the board's num moves
+static void
+free_moves_board( u_int** board, int nrows )
 {
 	for(int r=0; r<nrows; r++){
 		if(board[r])
@@ -448,6 +569,8 @@ dtor_BinaryLandStage( BinaryLandStage stage )
 	if( stage ) {
 		if ( stage->board )
 			free_board( stage->board, stage->nrows );
+		if ( stage->num_moves )
+			free_moves_board( stage->num_moves, stage->nrows );
 		free( stage );
 	}
     stage = NULL;
