@@ -36,7 +36,7 @@ struct binarylandstage_s {
 typedef struct _bls_pq_node_t {
 	int pos[2];
 	int nhops;
-}
+} bls_pq_node_t;
 
 #define ROW_POS( stage, which ) (stage -> which##_pos[0])
 #define COL_POS( stage, which ) (stage -> which##_pos[1])
@@ -212,30 +212,45 @@ ctor_BinaryLandStage( FILE* file )
 }
 
 /// debug print
-// void 
-// debug_BinaryLandStage( BinaryLandStage stage, FILE* out_file )
-// {
-// 	if ( stage ) {
-// 		fprintf( out_file, "Size: %dx%d\nG: [%d,%d]\nStart\n  [: [%d,%d]\n  ]: [%d,%d]\n",
-// 					stage->nrows, stage->ncols,
-// 					stage->goal_pos[0], stage->goal_pos[1],
-// 					stage->left_brkt_pos[0], stage->left_brkt_pos[1],
-// 					stage->right_brkt_pos[0], stage->right_brkt_pos[1]
-// 			   );
+void 
+debug_BinaryLandStage( BinaryLandStage stage, FILE* out_file )
+{
+	char buffer[stage->ncols + 2];
+	int r, c;
+	
+	if ( stage ) {
+		fprintf( out_file, "Size: %dx%d\nG: [%d,%d]\nStart\n  [: [%d,%d]\n  ]: [%d,%d]\n",
+					stage->nrows, stage->ncols,
+					stage->goal_pos[0], stage->goal_pos[1],
+					stage->left_brkt_pos[0], stage->left_brkt_pos[1],
+					stage->right_brkt_pos[0], stage->right_brkt_pos[1]
+			   );
 
-// 		int r, c;
-// 		for( r=0; r<stage->nrows; r++ ) {
-// 			char buffer[stage->ncols+2];
-// 			for( c=0; c<stage->ncols; c++ )
-// 				buffer[c] = stage->board[r][c];
+		for( r=0; r<stage->nrows; r++ ) {
+			for( c=0; c<stage->ncols; c++ )
+				buffer[c] = stage->board[r][c];
 
-// 			buffer[stage->ncols] = '\n';
-// 			buffer[stage->ncols+1] = '\0';
-// 			fputs( buffer, out_file );
-// 		}
-// 	}
+			buffer[stage->ncols] = '\n';
+			buffer[stage->ncols+1] = '\0';
+			fputs( buffer, out_file );
+		}
 
-// }
+		if ( stage->num_moves ) {
+			for ( r=0; r<stage->nrows; r++ ) {
+				for ( c=0; c<stage->ncols; c++ ) {
+					if ( !IS_NOT_WALL( stage, r, c ) ) {
+						fprintf( out_file, "-1 " );
+					} else {
+						fprintf( out_file, "%02u ", stage->num_moves[r][c] );
+					}
+				}
+				
+				fputs( "\n", out_file );
+			}
+		}
+	}
+
+}
 
 /// move the left and right brackets on the stage, dependent on the
 /// movement of the left bracket, right bracket moves polar opposite
@@ -451,8 +466,8 @@ get_adj_tiles( BinaryLandStage stage, int pos[2], int adj_tiles[4][2], int *num_
 	int r, c;
 	int adj_cnt = 0;
 
-	for ( r_idx = -1; r_idx <= 1; r_idx+=2 )
-		for ( c_idx = -1; c_idx <= 1; c_idx+=2 )
+	for ( r_idx = -1; r_idx <= 1; r_idx+=2 ) {
+		for ( c_idx = -1; c_idx <= 1; c_idx+=2 ) {
 			r = r_pos + r_idx;
 			c = c_pos + c_idx;
 			if ( IS_VALID_POS( r, c ) && 
@@ -462,8 +477,25 @@ get_adj_tiles( BinaryLandStage stage, int pos[2], int adj_tiles[4][2], int *num_
 				adj_tiles[adj_cnt][1] = c;
 				++adj_cnt;
 			}
+		}
+	}
 
 	*num_adj_tiles = adj_cnt;
+}
+
+static void
+insert_adj_into_pq( PriorityQueue pq, int adj_tiles[2], u_int nhops )
+{
+	bls_pq_node_t  node;
+	void          *node_p;
+
+	node.pos[0] = adj_tiles[0];
+	node.pos[1] = adj_tiles[1];
+	node.nhops  = nhops;
+
+	node_p = ( void * )&node;
+
+	insert_PriorityQueue( pq, nhops, node_p);
 }
 
 /// calculate the number of moves/hop for each white space in board
@@ -472,36 +504,60 @@ static void
 calc_moves( BinaryLandStage stage )
 {
 	PriorityQueue pq = NULL;
-	int 	*goal_pos,
-			 nrows,
-			 ncols;
-	int		 r_idx, c_idx;
-	u_int  **num_moves;
-	char   **board;
+	int 	*goal_pos = stage->goal_pos,
+			 nrows = stage->nrows,
+			 ncols = stage->ncols;
+	int		 r_idx, c_idx, r, c;
+	u_int  **num_moves = stage->num_moves;
 	int    adj_tiles[4][2];
 	int    num_adj_tiles = 0;
-	int    hops = 0;
-	
-	goal_pos = stage->goal_pos;
-	nrows = stage->nrows;
-	ncols = stage->ncols;
-	num_moves = stage->num_moves;
-	board = stage->board;
+	bls_pq_node_t   *node_val_p = NULL;
+	int nhops = 0;
+	bool   seen[nrows][ncols];
+
 	pq = ctor_PriorityQueue();
+
+	memset( seen, false, sizeof(bool) * nrows * ncols );
 
 	/* Scan board first for any walls */
 	for ( r_idx = 0; r_idx < nrows; r_idx++ ) {
 		for ( c_idx = 0; c_idx < ncols; c_idx++ ) {
 			if ( !IS_NOT_WALL(stage, r_idx, c_idx) ) {
 				num_moves[r_idx][c_idx] = UINT_MAX;
+				seen[r_idx][c_idx] = true;
+			} else if ( !IS_NOT( stage, r_idx, c_idx, GOAL ) ) {
+				seen[r_idx][c_idx] = true;
 			}
 		}
 	}
 
+	/* get the adj tiles of goal and push to queue */
 	get_adj_tiles( stage, goal_pos, adj_tiles, &num_adj_tiles );
-
 	for ( r_idx = 0; r_idx < num_adj_tiles; r_idx++ ) {
-		
+		printf(" inserting into pq: r:%d c:%d h%d\n", adj_tiles[r_idx][0], adj_tiles[r_idx][1], nhops);
+		insert_adj_into_pq( pq, adj_tiles[r_idx], nhops );
+	}
+
+	while ( !empty_PriorityQueue( pq ) ) {
+		node_val_p = (bls_pq_node_t *)extract_min_PriorityQueue( pq );
+		r = node_val_p->pos[0];
+		c = node_val_p->pos[1];
+		nhops = node_val_p->nhops;
+
+		printf("extracting min: r:%d c:%d h:%d\n", r, c, nhops);
+
+		if (seen[r][c])
+			continue;
+
+		seen[r][c] = true;
+		num_moves[r][c] = nhops;
+
+		nhops++;
+		get_adj_tiles( stage, node_val_p->pos, adj_tiles, &num_adj_tiles );
+		for ( r_idx = 0; r_idx < num_adj_tiles; r_idx++ ) {
+		printf(" inserting into pq: r:%d c:%d h%d\n", adj_tiles[r_idx][0], adj_tiles[r_idx][1], nhops);
+			insert_adj_into_pq( pq, adj_tiles[r_idx], nhops );
+		}
 	}
 
 	dtor_PriorityQueue( pq );
@@ -548,6 +604,7 @@ free_board( char** board, int nrows )
 	free(board);
 	board = NULL;
 }
+
 
 /// deallocating the board's num moves
 static void

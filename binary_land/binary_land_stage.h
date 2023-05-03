@@ -70,7 +70,7 @@ void dtor_BinaryLandStage( BinaryLandStage stage );
 ///
 /// @param out the file to print the output
 ///
-//void debug_BinaryLandStage( BinaryLandStage stage, FILE* out );
+void debug_BinaryLandStage( BinaryLandStage stage, FILE* out );
 
 ///
 /// move_BinaryLandStage
