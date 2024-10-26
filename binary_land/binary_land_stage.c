@@ -14,6 +14,7 @@
 /// 	12/29/2020
 ///
 
+#include <assert.h>
 #include <ctype.h>
 #include <limits.h>
 #include <stdio.h>
@@ -252,84 +253,113 @@ debug_BinaryLandStage( BinaryLandStage stage, FILE* out_file )
 
 }
 
+/// get next position of character given direction
+void
+next_pos_dir_BinaryLandStage( BinaryLandStage 	 stage, 
+						      Direction          dir, 
+						      int				 new_lb_pos[2], 
+						      int				 new_rb_pos[2] )
+{
+	switch( dir ) {
+		case dir_left:
+		{
+			int new_lb_col = COL_POS( stage, left_brkt ) - 1;
+			int new_rb_col = COL_POS( stage, right_brkt ) + 1;
+
+			if ( new_rb_col < stage->ncols &&
+				 BOARD( stage, ROW_POS( stage, right_brkt ), new_rb_col ) != WALL )
+			{
+				new_rb_pos[1] = new_rb_col;
+			}
+
+			if ( new_lb_col >= 0 && 
+				 BOARD( stage, ROW_POS( stage, left_brkt ), new_lb_col ) != WALL )
+			{
+				new_lb_pos[1] = new_lb_col;
+			}
+
+			break;
+		}
+
+		case dir_right:
+		{
+			int new_lb_col = COL_POS( stage, left_brkt ) + 1;
+			int new_rb_col = COL_POS( stage, right_brkt ) - 1;
+
+			if ( new_rb_col >= 0 && 
+				 BOARD( stage, ROW_POS( stage, right_brkt ), new_rb_col ) != WALL )
+			{
+				new_rb_pos[1] = new_rb_col;
+			}
+
+			if ( new_lb_col < stage->ncols && 
+				 BOARD( stage, ROW_POS( stage, left_brkt ), new_lb_col ) != WALL )
+			{
+				new_lb_pos[1] = new_lb_col;
+			}
+
+			break;
+		}
+
+		case dir_up:
+		{
+			int new_lb_row = ROW_POS( stage, left_brkt ) - 1;
+			int new_rb_row = ROW_POS( stage, right_brkt ) - 1;
+
+			if ( new_rb_row >= 0 && 
+				 BOARD( stage, new_rb_row, COL_POS( stage, right_brkt ) ) != WALL )
+			{
+				new_rb_pos[0] = new_rb_row;
+			}
+
+			if ( new_lb_row >= 0 && 
+				 BOARD( stage, new_lb_row, COL_POS( stage, left_brkt ) ) != WALL )
+			{
+				new_lb_pos[0] = new_lb_row;
+			}
+
+			break;
+		}
+
+		case dir_down:
+		{
+			int new_lb_row = ROW_POS( stage, left_brkt ) + 1;
+			int new_rb_row = ROW_POS( stage, right_brkt ) + 1;
+
+			if ( new_rb_row < stage->nrows && 
+				 BOARD( stage, new_rb_row, COL_POS( stage, right_brkt ) ) != WALL )
+			{
+				new_rb_pos[0] = new_rb_row;
+			}
+
+			if ( new_lb_row < stage->nrows && 
+				 BOARD( stage, new_lb_row, COL_POS( stage, left_brkt ) ) != WALL )
+			{
+				new_lb_pos[0] = new_lb_row;
+			}
+
+			break;
+		}
+
+		default:
+			assert(0);
+	}
+}
+
 /// move the left and right brackets on the stage, dependent on the
 /// movement of the left bracket, right bracket moves polar opposite
 bool 
 move_BinaryLandStage( BinaryLandStage stage, Direction dir ) 
 {
-	switch( dir ) {
-		case dir_left:
-		{
-			int left_brkt_col = COL_POS( stage, left_brkt ) - 1;
-			int right_brkt_col = COL_POS( stage, right_brkt ) + 1;
+	int new_lb_pos[2], new_rb_pos[2];
 
-			if ( right_brkt_col < stage->ncols &&
-					BOARD( stage, ROW_POS( stage, right_brkt ), right_brkt_col ) != WALL ) {				 
-				COL_POS( stage, right_brkt ) = right_brkt_col;
-			}
-	
-			if ( left_brkt_col >= 0 &&
-					BOARD( stage, ROW_POS( stage, left_brkt ), left_brkt_col ) != WALL ) {
-				COL_POS( stage, left_brkt ) = left_brkt_col;
-			}
+	memcpy( new_lb_pos, stage->left_brkt_pos, 2 * sizeof( int ) );
+	memcpy( new_rb_pos, stage->right_brkt_pos, 2 * sizeof( int ) );
 
-			break;
-		}
-		case dir_right:
-		{
-			int left_brkt_col = COL_POS( stage, left_brkt ) + 1;
-			int right_brkt_col = COL_POS( stage, right_brkt ) - 1;
+	next_pos_dir_BinaryLandStage( stage, dir, new_lb_pos, new_rb_pos );
 
-			if ( right_brkt_col >= 0 &&
-					BOARD( stage, ROW_POS( stage, right_brkt ), right_brkt_col ) != WALL ) {			 
-				COL_POS( stage, right_brkt ) = right_brkt_col;
-			}
-
-			if ( left_brkt_col < stage->ncols &&
-					BOARD( stage, ROW_POS( stage, left_brkt ), left_brkt_col ) != WALL ) {
-				COL_POS( stage, left_brkt ) = left_brkt_col;
-			}
-
-			break;
-		}
-		case dir_up: 
-		{
-			int left_brkt_row = ROW_POS( stage, left_brkt ) - 1;
-			int right_brkt_row = ROW_POS( stage, right_brkt ) - 1;
-
-			if ( right_brkt_row >= 0 &&
-					BOARD( stage, right_brkt_row, COL_POS( stage, right_brkt ) ) != WALL ) {
-				ROW_POS( stage, right_brkt ) = right_brkt_row;
-			}
-
-			if ( left_brkt_row >= 0 && 
-					BOARD( stage, left_brkt_row, COL_POS( stage, left_brkt ) ) != WALL ) {
-				ROW_POS( stage, left_brkt ) = left_brkt_row;
-			}
-			
-			break;
-		}
-		case dir_down: 
-		{
-			int left_brkt_row = ROW_POS( stage, left_brkt ) + 1;
-			int right_brkt_row = ROW_POS( stage, right_brkt ) + 1;
-
-			if ( right_brkt_row < stage->nrows &&
-					BOARD( stage, right_brkt_row, COL_POS( stage, right_brkt ) ) != WALL ) {
-				ROW_POS( stage, right_brkt ) = right_brkt_row;
-			}
-
-			if ( left_brkt_row < stage->nrows && 
-					BOARD( stage, left_brkt_row, COL_POS( stage, left_brkt ) ) != WALL ) {
-				ROW_POS( stage, left_brkt ) = left_brkt_row;
-			}
-
-			break;
-		}
-		default:
-			fprintf( stderr, "Unknown Direction value: %d\n", dir );
-			return false;
-	};
+	memcpy( stage->left_brkt_pos, new_lb_pos, 2 * sizeof( int ) );
+	memcpy( stage->right_brkt_pos, new_rb_pos, 2 * sizeof( int ) );
 
 	return true;
 } 

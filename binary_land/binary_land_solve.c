@@ -191,7 +191,7 @@ solve_BinaryLand( char mode )
 
 		default:
 			// should not reach this statement
-			break;
+			return is_solved;
 	}
 
 	printw( is_solved ? "Solved!\nPress Enter to Exit." : "Game Over");
