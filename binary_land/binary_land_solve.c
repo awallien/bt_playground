@@ -32,6 +32,7 @@
 #define DELAY() usleep( delay )
 #define POS( stage, which, buf ) pos_BinaryLandStage( stage, which, buf, buf + 1 )
 #define PRINT_STAGE_DELAY() ncurses_print_stage(); DELAY()
+#define POS_EQUAL( pos1, pos2 ) ( ( pos1[0] == pos2[0] ) && ( pos1[1] == pos2[1] ) )
 
 
 static BinaryLandHashSet hashset = NULL;
@@ -40,7 +41,7 @@ static PriorityQueue pq = NULL;
 static BinaryLandStage stage = NULL;
 static char** board;
 static int nrows, ncols;
-static int left[2], right[2], goal[2];
+static int left[2], right[2], goal[2], next_left[2], next_right[2];
 
 /* default delay is 1 second */
 static double delay = 100000;
@@ -104,13 +105,23 @@ solve_bt( )
 	if ( is_solved_BinaryLandStage( stage ) )
 		return true;
 
-	for( int d = dir_left; d <= dir_down; d++ ) {
-		if ( can_move_BinaryLandStage( stage, d ) ) {
+	for( int d = dir_left; d <= dir_down; d++ )
+	{
+		POS( stage, char_left_brkt, left );
+		POS( stage, char_right_brkt, right );
+		next_pos_dir_BinaryLandStage( stage, d, next_left, next_right );
+
+		if (!(POS_EQUAL(left, next_left) && POS_EQUAL(right, next_right)) &&
+			!seen_BinaryLandHashSet( hashset, next_left, next_right))
+		{
 			move_BinaryLandStage( stage, d );
-			POS( stage, char_left_brkt, left );
-			POS( stage, char_right_brkt, right );
-			if ( !seen_BinaryLandHashSet( hashset, left, right ) && solve_bt( ) )
+			PRINT_STAGE_DELAY();
+
+			if (solve_bt())
+			{
 				return true;
+			}
+
 			reverse_move_BinaryLandStage( stage, d );
 			PRINT_STAGE_DELAY();
 		}

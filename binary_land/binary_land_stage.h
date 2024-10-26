@@ -73,6 +73,24 @@ void dtor_BinaryLandStage( BinaryLandStage stage );
 void debug_BinaryLandStage( BinaryLandStage stage, FILE* out );
 
 ///
+/// next_pos_dir_BinaryLandStage
+///
+/// get the next left and right bracket's positoin after applying a direction
+///
+/// @param stage the Binary Land stage
+///
+/// @param dir Direction
+///
+/// @param new_lb_pos the new left bracket position
+///
+/// @param new_rb_pos the new right bracket position
+///
+void next_pos_dir_BinaryLandStage( BinaryLandStage 	 stage, 
+	      					       Direction         dir, 
+						           int				 new_lb_pos[2], 
+    					           int				 new_rb_pos[2] );
+
+///
 /// move_BinaryLandStage
 ///
 /// moves the left bracket on screen with the given direction;
@@ -97,7 +115,7 @@ bool move_BinaryLandStage( BinaryLandStage stage, Direction dir );
 /// 
 /// @return true if one of the brackets change position; otherwise, false
 ///
-bool can_move_BinaryLandStage( BinaryLandStage stage, Direction dir );
+// bool can_move_BinaryLandStage( BinaryLandStage stage, Direction dir );
 
 ///
 /// reverse_move_BinaryLandStage
@@ -106,7 +124,7 @@ bool can_move_BinaryLandStage( BinaryLandStage stage, Direction dir );
 ///
 /// @param stage Binary Land stage
 ///
-/// @param dir direction to move left bracket
+/// @param dir direction used to move left bracket
 ///
 /// @return true if move can be made; otherwise, false
 ///

@@ -364,49 +364,49 @@ move_BinaryLandStage( BinaryLandStage stage, Direction dir )
 	return true;
 } 
 
-/// true if one of the brackets is able to change position; otherwise false
-bool 
-can_move_BinaryLandStage( BinaryLandStage stage, Direction dir )
-{
-	int pos_right_brkt, pos_left_brkt;
-	switch( dir ) {
-		case dir_left:
-		{
-			pos_right_brkt = COL_POS( stage, right_brkt ) + 1;
-			pos_left_brkt = COL_POS( stage, left_brkt ) - 1;
+// /// true if one of the brackets is able to change position; otherwise false
+// bool 
+// can_move_BinaryLandStage( BinaryLandStage stage, Direction dir )
+// {
+// 	int pos_right_brkt, pos_left_brkt;
+// 	switch( dir ) {
+// 		case dir_left:
+// 		{
+// 			pos_right_brkt = COL_POS( stage, right_brkt ) + 1;
+// 			pos_left_brkt = COL_POS( stage, left_brkt ) - 1;
 
-			return ( pos_right_brkt < stage->ncols && IS_NOT_WALL( stage, ROW_POS( stage, right_brkt ), pos_right_brkt ) ) || 
-					( pos_left_brkt >= 0 && IS_NOT_WALL( stage, ROW_POS( stage, left_brkt ), pos_left_brkt ) );
-		}
-		case dir_right:
-		{
-			pos_right_brkt = COL_POS( stage, right_brkt ) - 1;
-			pos_left_brkt = COL_POS( stage, right_brkt ) + 1;
+// 			return ( pos_right_brkt < stage->ncols && IS_NOT_WALL( stage, ROW_POS( stage, right_brkt ), pos_right_brkt ) ) || 
+// 					( pos_left_brkt >= 0 && IS_NOT_WALL( stage, ROW_POS( stage, left_brkt ), pos_left_brkt ) );
+// 		}
+// 		case dir_right:
+// 		{
+// 			pos_right_brkt = COL_POS( stage, right_brkt ) - 1;
+// 			pos_left_brkt = COL_POS( stage, right_brkt ) + 1;
 
-			return ( pos_right_brkt >= 0 && IS_NOT_WALL( stage, ROW_POS( stage, right_brkt ), pos_right_brkt ) ) ||
-					( pos_left_brkt < stage->ncols && IS_NOT_WALL( stage, ROW_POS( stage, left_brkt ), pos_left_brkt ) );
-		}
-		case dir_up:
-		{
-			pos_right_brkt = ROW_POS( stage, right_brkt ) - 1;
-			pos_left_brkt = ROW_POS( stage, left_brkt ) - 1;
+// 			return ( pos_right_brkt >= 0 && IS_NOT_WALL( stage, ROW_POS( stage, right_brkt ), pos_right_brkt ) ) ||
+// 					( pos_left_brkt < stage->ncols && IS_NOT_WALL( stage, ROW_POS( stage, left_brkt ), pos_left_brkt ) );
+// 		}
+// 		case dir_up:
+// 		{
+// 			pos_right_brkt = ROW_POS( stage, right_brkt ) - 1;
+// 			pos_left_brkt = ROW_POS( stage, left_brkt ) - 1;
 
-			return ( pos_right_brkt >= 0 && IS_NOT_WALL( stage, pos_right_brkt, COL_POS( stage, right_brkt ) ) ) ||
-					( pos_left_brkt >= 0 && IS_NOT_WALL( stage, pos_left_brkt, COL_POS( stage, left_brkt ) ) ); 
-		}
-		case dir_down:
-		{
-			pos_right_brkt = ROW_POS( stage, right_brkt ) + 1;
-			pos_left_brkt = ROW_POS( stage, left_brkt ) + 1;
+// 			return ( pos_right_brkt >= 0 && IS_NOT_WALL( stage, pos_right_brkt, COL_POS( stage, right_brkt ) ) ) ||
+// 					( pos_left_brkt >= 0 && IS_NOT_WALL( stage, pos_left_brkt, COL_POS( stage, left_brkt ) ) ); 
+// 		}
+// 		case dir_down:
+// 		{
+// 			pos_right_brkt = ROW_POS( stage, right_brkt ) + 1;
+// 			pos_left_brkt = ROW_POS( stage, left_brkt ) + 1;
 
-			return ( pos_right_brkt < stage->nrows && IS_NOT_WALL( stage, pos_right_brkt, COL_POS( stage, right_brkt ) ) ) ||
-					( pos_left_brkt < stage->nrows && IS_NOT_WALL( stage, pos_left_brkt, COL_POS( stage, left_brkt ) ) ); 
-		}
-		default:
-			fprintf( stderr, "Unknown Direction value: %d\n", dir );
-			return false;
-	}
-}
+// 			return ( pos_right_brkt < stage->nrows && IS_NOT_WALL( stage, pos_right_brkt, COL_POS( stage, right_brkt ) ) ) ||
+// 					( pos_left_brkt < stage->nrows && IS_NOT_WALL( stage, pos_left_brkt, COL_POS( stage, left_brkt ) ) ); 
+// 		}
+// 		default:
+// 			fprintf( stderr, "Unknown Direction value: %d\n", dir );
+// 			return false;
+// 	}
+// }
 
 bool 
 reverse_move_BinaryLandStage( BinaryLandStage stage, Direction dir )
